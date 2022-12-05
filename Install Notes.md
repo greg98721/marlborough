@@ -21,16 +21,20 @@ Copy in a standard `.gitignore` from another angular project
 
 ```json
 {
-  "name": "<project name here>",
+  "name": "marlborough",
   "workspaces": []
 }
 ```
 
+Create the packages folder in the root
+
 ## Install Client
 
-`ng n marlboroughClient -g`
+Change to the packages folder
 
-Select SCSS for styles
+`ng n marlborough-client --style scss --routing true --skip-git true --skip-install true`
+
+In the root packages folder add `packages/marlborough-client` to the workspaces
 
 ## Install Server
 
