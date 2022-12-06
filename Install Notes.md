@@ -40,6 +40,4 @@ In the root packages folder add `packages/marlborough-client` to the workspaces
 
 If required install Nest into Node: `npm i -g @nestjs/cli`
 
-Then create the app: `nest n marlboroughServer -g --strict`
-
-Copy `.gitignore` from the client before commiting.
+Then create the app: `nest n marlborough-server --package-manager npm --language ts --strict --skip-git --skip-install`
