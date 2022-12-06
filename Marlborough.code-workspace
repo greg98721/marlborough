@@ -1,0 +1,22 @@
+{
+    "folders": [
+        {
+            "name": "ROOT",
+            "path": "./"
+        },
+        {
+            "name": "marlborough-client",
+            "path": "packages/marlborough-client"
+        },
+        {
+            "name": "marlborough-server",
+            "path": "packages/marlborough-server"
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "node_modules/": true,
+            "packages/": true
+        }
+    }
+}
