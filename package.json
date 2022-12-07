@@ -1,7 +1,6 @@
 {
     "name": "marlborough",
     "workspaces": [
-        "packages/marlborough-client",
-        "packages/marlborough-server"
+        "packages/*"
     ]
   }

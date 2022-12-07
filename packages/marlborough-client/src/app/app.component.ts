@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { doSomething, doSomethingMore } from '@marlborough/model';
 
 @Component({
   selector: 'app-root',

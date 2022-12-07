@@ -5,18 +5,24 @@
             "path": "./"
         },
         {
-            "name": "marlborough-client",
+            "name": "MARLBOROUGH CLIENT",
             "path": "packages/marlborough-client"
         },
         {
-            "name": "marlborough-server",
+            "name": "MARLBOROUGH SERVER",
             "path": "packages/marlborough-server"
+        },
+        {
+            "name": "MARLBOROUGH MODEL",
+            "path": "packages/marlborough-model"
         }
     ],
     "settings": {
         "files.exclude": {
             "node_modules/": true,
-            "packages/": true
+            "packages/": true,
+            "**/dist": true,
+            "**/.angular": true
         }
     }
 }
