@@ -17,7 +17,8 @@ export function cityName(a: Airport): string {
     }
 }
 
-export interface AirRoute {   // should be route but want to avoid any mix up with angular routing
+/** should be route but want to avoid any mix up with angular routing */
+export interface AirRoute {
     origin: Airport;
     destination: Airport;
     distance: number;
