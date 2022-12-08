@@ -4,7 +4,7 @@
 
 A sample project to show using a monorepos to hold the client, server and common code.
 
-Using Angular for the client, Nest.js for the server and npm workspaces to link it all togeather and serves to provide common editor and TypeScript settings.
+Using Angular for the client, Nest.js for the server, npm workspaces to link it the build togeather and composite Typescript projects to link the compilation.
 Also demonstrates configuring VS Code to work with them all.
 
 ## Create Root Folder
@@ -175,3 +175,5 @@ export * from './src/test'
     }
   ]
 ```
+
+See [Typescript project references](https://www.typescriptlang.org/docs/handbook/project-references.html)
