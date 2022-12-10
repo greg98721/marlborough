@@ -1,4 +1,4 @@
-import { PlainDate } from "./scheduleFlight";
+import { PlainDate } from "./timetableFlight";
 
 export interface Booking {
     date: PlainDate;

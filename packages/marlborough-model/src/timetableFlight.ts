@@ -13,6 +13,14 @@ export interface PlainDate {
     day: number;
 }
 
+export function decimalHourToPlainTime(h: number, minuteRounding: number): PlainTime {
+    const hour = Math.floor(h);
+    // round to minutes
+    const minute =
+      Math.floor(((h - hour) * 60) / minuteRounding) * minuteRounding;
+    return { hour: hour, minute: minute };
+  }
+
 /** A simple time and timezone is that of the airport on that day.
  * No seconds value as this is just for scheduling
  */
@@ -23,9 +31,9 @@ export interface PlainTime {
     minute: number;
 }
 
-export interface ScheduleFlight {
+export interface TimetableFlight {
     route: AirRoute;
-    aircaft: Aircraft;
+    aircraft: Aircraft;
     /** Should be unique in each day */
     flightNumber: string;
     departs: PlainTime;
@@ -33,10 +41,6 @@ export interface ScheduleFlight {
     arrives: PlainTime;
     /** a 7 bit array - see days below */
     days: number;
-    /** first day of operation */
-    starts: PlainDate;
-    /** last day of operation */
-    ends: PlainDate;
 }
 
 export const SUNDAY = 0x01;
@@ -49,9 +53,8 @@ export const SATURDAY = 0x40;
 export const WEEKDAYS = MONDAY + TUESDAY + WEDNESDAY + THURSDAY + FRIDAY;
 export const WEEKEND = SUNDAY + SATURDAY;
 
-export function getSchduleDayFromDate(d: PlainDate): number {
-    const n = new Date(d.year, d.month, d.day);
-    switch (getDay(n)) {
+export function getTimetableDayFromDate(d: Date): number {
+    switch (getDay(d)) {
         case 0: return SUNDAY;
         case 1: return MONDAY;
         case 2: return TUESDAY;

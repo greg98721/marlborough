@@ -1,9 +1,9 @@
-import { PlainDate } from './scheduleFlight';
+import { PlainDate } from './timetableFlight';
 
 export interface Flight {
     flightNumber: string;
-    date: PlainDate;
-    aircraftCode: string;
+    /** days since 1/12/2022 */
+    date: number;
     /** Normal JS Date with timezone as this records an event */
     departed: Date | undefined;
     arrived: Date | undefined;

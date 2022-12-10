@@ -21,5 +21,4 @@ export function cityName(a: Airport): string {
 export interface AirRoute {
     origin: Airport;
     destination: Airport;
-    distance: number;
 }
