@@ -1,8 +1,9 @@
-import { addDays } from 'date-fns';
+import { addDays, differenceInCalendarDays } from 'date-fns';
 
 import {
   Aircraft,
   AirRoute,
+  capacity,
   decimalHourToPlainTime,
   Flight,
   getTimetableDayFromDate,
@@ -33,7 +34,8 @@ export interface ServerTimetableFlight extends TimetableFlight {
 }
 
 export interface ServerFlight extends Flight {
-  bookings: ServerFlight[] | undefined;
+  /** Only the manually added ones - simulate with EmptySeats field otherwise */
+  bookings: ServerFlight[];
   randomSeed: string;
 }
 
@@ -388,21 +390,56 @@ function createFlight(
   days: number[],
 ): ServerFlight[] {
   const rnd = new PsuedoRandom(timetableFlight.randomSeed);
-  // first filter the days when there is no flight
   const start = new Date(2022, 1, 1);
+  const createEmptySeats = (dayOfFlight: number) => {
+    // TODO calculate number of seats booked - depends on how soon is the flight - size of flight and rush hour
+    // use a sin curve for bookings over the 6 weeks before the flight
+    let bookedPercent;
+    // adjust relative to time of day
+    switch (timetableFlight.departs.hour) {
+      case 7:
+      case 8:
+      case 16:
+      case 17:
+        bookedPercent = rnd.flat(0.85, 1.3); // greater than 100% as to emulate booked out long way ahead
+        break;
+      case 6:
+      case 9:
+      case 15:
+      case 18:
+      case 19:
+        bookedPercent = rnd.flat(0.7, 1.05);
+        break;
+      default:
+        bookedPercent = rnd.flat(0.4, 0.75);
+        break;
+    }
+    const daysTillFlight =
+      dayOfFlight - differenceInCalendarDays(start, new Date());
+    if (daysTillFlight > 42) {
+      bookedPercent = 0;
+    } else if (daysTillFlight > 0) {
+      bookedPercent = (bookedPercent * dayOfFlight) / 42;
+    }
+    bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
+    return (1 - bookedPercent) * capacity(timetableFlight.aircraft);
+  };
+
   return days
-    .map((n: number) => [n, addDays(start, n)])
-    .filter((d: [number, Date]) => {
-      const t = getTimetableDayFromDate(d[1]);
+    .filter((n) => {
+      // first filter the days when there is no flight
+      const d = addDays(start, n);
+      const t = getTimetableDayFromDate(d);
       return (t & timetableFlight.days) > 0;
     })
-    .map((d: [number, Date]) => {
+    .map((n) => {
       return {
         flightNumber: timetableFlight.flightNumber,
-        date: d[0],
+        date: n,
+        emptySeats: createEmptySeats(n),
         departed: undefined,
         arrived: undefined,
-        bookings: undefined,
+        bookings: [],
         randomSeed: rnd.nextSeed(),
       };
     });

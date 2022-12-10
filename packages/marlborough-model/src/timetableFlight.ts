@@ -2,6 +2,7 @@ import { getDay } from 'date-fns';
 import { AirRoute } from './airRoute';
 
 export type Aircraft = 'ATR42' | 'A220-100';
+export function capacity(aircraft: Aircraft) { return aircraft === 'ATR42' ? 50 : 110 }
 
 /** A simple date with no time and timezone is that of the airport on that day */
 export interface PlainDate {
@@ -17,9 +18,9 @@ export function decimalHourToPlainTime(h: number, minuteRounding: number): Plain
     const hour = Math.floor(h);
     // round to minutes
     const minute =
-      Math.floor(((h - hour) * 60) / minuteRounding) * minuteRounding;
+        Math.floor(((h - hour) * 60) / minuteRounding) * minuteRounding;
     return { hour: hour, minute: minute };
-  }
+}
 
 /** A simple time and timezone is that of the airport on that day.
  * No seconds value as this is just for scheduling
