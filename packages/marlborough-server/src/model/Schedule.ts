@@ -2,12 +2,13 @@ import { addDays, differenceInCalendarDays } from 'date-fns';
 
 import {
   Aircraft,
+  Airport,
   AirRoute,
+  calendarStart,
   capacity,
   decimalHourToPlainTime,
   Flight,
   getTimetableDayFromDate,
-  PlainDate,
   TimetableFlight,
   WEEKDAYS,
   WEEKEND,
@@ -18,7 +19,7 @@ export interface Schedule {
   routes: ServerAirRoute[];
   randomSeed: string;
 }
-export interface ServerAirRoute extends AirRoute {
+interface ServerAirRoute extends AirRoute {
   timetableFlights: ServerTimetableFlight[] | undefined;
   intensity: 1 | 2 | 3;
   distance: number;
@@ -26,17 +27,42 @@ export interface ServerAirRoute extends AirRoute {
   randomSeed: string;
 }
 
-export interface ServerTimetableFlight extends TimetableFlight {
-  flights: ServerFlight[] | undefined;
-  /** array of all the days flights have been inflated */
-  inflated: number[];
+function asAirRoute(s: ServerAirRoute): AirRoute {
+  return {
+    origin: s.origin,
+    destination: s.destination,
+  };
+}
+
+interface ServerTimetableFlight extends TimetableFlight {
+  flights: ServerFlight[];
   randomSeed: string;
 }
 
-export interface ServerFlight extends Flight {
+function asTimetableFlight(s: ServerTimetableFlight): TimetableFlight {
+  return {
+    route: s.route,
+    aircraft: s.aircraft,
+    flightNumber: s.flightNumber,
+    departs: s.departs,
+    arrives: s.arrives,
+    days: s.days,
+  };
+}
+interface ServerFlight extends Flight {
   /** Only the manually added ones - simulate with EmptySeats field otherwise */
   bookings: ServerFlight[];
   randomSeed: string;
+}
+
+function asFlight(s: ServerFlight): Flight {
+  return {
+    flightNumber: s.flightNumber,
+    date: s.date,
+    emptySeats: s.emptySeats,
+    departed: s.departed,
+    arrived: s.arrived,
+  };
 }
 
 export function createSchedule(): Schedule {
@@ -44,6 +70,62 @@ export function createSchedule(): Schedule {
   const rnd = new PsuedoRandom(seed);
   const schedule = { routes: createRoutes(rnd), randomSeed: seed };
   return schedule;
+}
+
+/** Get the list of actual origin airports for which there are routes */
+export function getOrigins(schedule: Schedule): Airport[] {
+  // the Set makes the list of origins unique
+  const unique = [...new Set(schedule.routes.map((r) => r.origin))];
+  return unique.sort();
+}
+
+export function getRoutes(schedule: Schedule, origin: Airport): AirRoute[] {
+  return schedule.routes
+    .filter((r) => r.origin === origin)
+    .map((r) => {
+      return asAirRoute(r);
+    });
+}
+
+export function getTimetable(
+  schedule: Schedule,
+  origin: Airport,
+): TimetableFlight[] {
+  // this function has side effects as we made need to inflate the list of timetable flights for each route
+  return schedule.routes
+    .filter((r) => r.origin === origin)
+    .flatMap((r) => {
+      if (r.timetableFlights === undefined) {
+        r.timetableFlights = createTimetableFlights(r);
+      }
+      return r.timetableFlights.map((t) => asTimetableFlight(t));
+    });
+}
+
+export function getFlights(
+  schedule: Schedule,
+  origin: Airport,
+  destination: Airport,
+  from: number,
+  till: number,
+): { t: TimetableFlight; f: Flight[] }[] {
+  const route = schedule.routes.find(
+    (r) => r.origin === origin && r.destination === destination,
+  );
+  const days = Array.from({ length: till - from + 1 }, (_, i) => from + i);
+  if (route !== undefined) {
+    if (route.timetableFlights === undefined) {
+      route.timetableFlights = createTimetableFlights(route);
+    }
+    return route.timetableFlights
+      .map((t) => {
+        const flights = createFlight(t, days).map((f) => asFlight(f));
+        return { t: asTimetableFlight(t), f: flights };
+      })
+      .filter((d) => d.f.length > 0);
+  } else {
+    return [];
+  }
 }
 
 function createRoutes(rnd: PsuedoRandom): ServerAirRoute[] {
@@ -378,7 +460,7 @@ function createTimetableFlights(
       departs: departs,
       arrives: arrives,
       days: days,
-      flights: undefined,
+      flights: [],
       inflated: [],
       randomSeed: randomSeed,
     };
@@ -390,7 +472,6 @@ function createFlight(
   days: number[],
 ): ServerFlight[] {
   const rnd = new PsuedoRandom(timetableFlight.randomSeed);
-  const start = new Date(2022, 1, 1);
   const createEmptySeats = (dayOfFlight: number) => {
     // TODO calculate number of seats booked - depends on how soon is the flight - size of flight and rush hour
     // use a sin curve for bookings over the 6 weeks before the flight
@@ -415,7 +496,7 @@ function createFlight(
         break;
     }
     const daysTillFlight =
-      dayOfFlight - differenceInCalendarDays(start, new Date());
+      dayOfFlight - differenceInCalendarDays(calendarStart, new Date());
     if (daysTillFlight > 42) {
       bookedPercent = 0;
     } else if (daysTillFlight > 0) {
@@ -428,19 +509,24 @@ function createFlight(
   return days
     .filter((n) => {
       // first filter the days when there is no flight
-      const d = addDays(start, n);
+      const d = addDays(calendarStart, n);
       const t = getTimetableDayFromDate(d);
       return (t & timetableFlight.days) > 0;
     })
     .map((n) => {
-      return {
-        flightNumber: timetableFlight.flightNumber,
-        date: n,
-        emptySeats: createEmptySeats(n),
-        departed: undefined,
-        arrived: undefined,
-        bookings: [],
-        randomSeed: rnd.nextSeed(),
-      };
+      const existing = timetableFlight.flights.find((f) => f.date === n);
+      if (existing !== undefined) {
+        return existing;
+      } else {
+        return {
+          flightNumber: timetableFlight.flightNumber,
+          date: n,
+          emptySeats: createEmptySeats(n),
+          departed: undefined,
+          arrived: undefined,
+          bookings: [],
+          randomSeed: rnd.nextSeed(),
+        };
+      }
     });
 }
