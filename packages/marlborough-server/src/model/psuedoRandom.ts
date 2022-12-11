@@ -1,4 +1,4 @@
-import { Alea, PRNG } from 'seedrandom';
+import { alea, PRNG } from 'seedrandom';
 
 /** Wrapper to simplyfy use of seedable random number generator.
  * Math.random() cannot be manually seeded so will not be repeatable, hence using seedrandom library.
@@ -6,7 +6,7 @@ import { Alea, PRNG } from 'seedrandom';
 export class PsuedoRandom {
   readonly prng: PRNG;
   constructor(seed: string) {
-    this.prng = new Alea(seed);
+    this.prng = alea(seed);
   }
 
   withinPrecent(pc: number): boolean {
