@@ -106,13 +106,15 @@ export function getFlights(
   schedule: Schedule,
   origin: Airport,
   destination: Airport,
-  from: number,
-  till: number,
+  from: Date,
+  till: Date,
 ): { t: TimetableFlight; f: Flight[] }[] {
   const route = schedule.routes.find(
     (r) => r.origin === origin && r.destination === destination,
   );
-  const days = Array.from({ length: till - from + 1 }, (_, i) => from + i);
+  const fn = differenceInCalendarDays(from, calendarStart);
+  const tn = differenceInCalendarDays(till, calendarStart);
+  const days = Array.from({ length: tn - fn + 1 }, (_, i) => fn + i);
   if (route !== undefined) {
     if (route.timetableFlights === undefined) {
       route.timetableFlights = createTimetableFlights(route);
@@ -435,7 +437,7 @@ function createTimetableFlights(
       const we2 = rnd.flatInt(2, 3);
       divideDay(WEEKEND, we2, 9, 17);
       break;
-    case 2:
+    case 3:
       // Intensity 3: Every day - 5 to 8 flights per weekday 3 to 6 per weekend - evenly spaced
       const wd3 = rnd.flatInt(5, 8);
       divideDay(WEEKDAYS, wd3, 6, 23);
@@ -450,7 +452,7 @@ function createTimetableFlights(
     const h = t[1];
     const departs = decimalHourToPlainTime(h, 5);
     const arrives = decimalHourToPlainTime(h + flightTime, 1);
-    const flightNumber = `MA${currentFlightNumber.toFixed(3)}`;
+    const flightNumber = `MA${currentFlightNumber.toString().padStart(3, '0')}`;
     currentFlightNumber++;
 
     return {
@@ -496,14 +498,14 @@ function createFlight(
         break;
     }
     const daysTillFlight =
-      dayOfFlight - differenceInCalendarDays(calendarStart, new Date());
+      dayOfFlight - differenceInCalendarDays(new Date(), calendarStart);
     if (daysTillFlight > 42) {
       bookedPercent = 0;
     } else if (daysTillFlight > 0) {
       bookedPercent = (bookedPercent * dayOfFlight) / 42;
     }
     bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
-    return (1 - bookedPercent) * capacity(timetableFlight.aircraft);
+    return Math.floor((1 - bookedPercent) * capacity(timetableFlight.aircraft));
   };
 
   return days
