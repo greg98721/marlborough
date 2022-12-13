@@ -37,6 +37,6 @@ describe('RoutesController', () => {
   it('should only work with a valid airport', () => {
     expect(() => {
       airRoutesController.getRoutes('EGLL');
-    }).toThrowError(Error);
+    }).toThrowError(TypeError);
   });
 });
