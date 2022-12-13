@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A sample project to show using a monorepos to hold the client, server and common code.
+A sample project to show using a single repository to hold the client, server and common code (monorepos implies a single repos across a company - this ain't that).
 
 Using Angular for the client, Nest.js for the server, npm workspaces to link it the build togeather and composite Typescript projects to link the compilation.
 Also demonstrates configuring VS Code to work with them all.
@@ -177,3 +177,6 @@ export * from './src/test'
 ```
 
 See [Typescript project references](https://www.typescriptlang.org/docs/handbook/project-references.html)
+
+## Things To Note
+The automatic insertion of imports uses an absolute path - starting at `src/`. This falls over in Jest testing - better to use relative paths.

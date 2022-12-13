@@ -1,4 +1,9 @@
-export type Airport = 'NZAA' | 'NZCH' | 'NZDN' | 'NZHK' | 'NZNP' | 'NZNR' | 'NZNS' | 'NZPM' | 'NZQN' | 'NZTG' | 'NZWB' | 'NZWN';
+// We need to create a type guard for airports so we need to do a bit of work - see https://www.qualdesk.com/blog/2021/type-guard-for-string-union-types-typescript/
+const AIRPORTS = ['NZAA', 'NZCH', 'NZDN', 'NZHK', 'NZNP', 'NZNR', 'NZNS', 'NZPM', 'NZQN', 'NZTG', 'NZWB', 'NZWN'] as const;
+export type Airport = typeof AIRPORTS[number];
+export function isAirport(airport: string): airport is Airport {
+    return AIRPORTS.includes(airport as Airport)
+}
 
 export function cityName(a: Airport): string {
     switch (a) {
