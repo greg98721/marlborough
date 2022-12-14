@@ -43,9 +43,9 @@ describe('Schedule', () => {
     const christchurch = timetable.filter(
       (t) => t.route.destination === 'NZCH',
     );
-    expect(wellington.length).toBe(6);
+    expect(wellington.length).toBe(7);
     expect(nelson.length).toBe(2);
-    expect(christchurch.length).toBe(8);
+    expect(christchurch.length).toBe(7);
   };
 
   it('can get full timetable for Dunedin', () => {

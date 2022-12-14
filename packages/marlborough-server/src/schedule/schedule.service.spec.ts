@@ -15,4 +15,6 @@ describe('ScheduleService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  // The service is tested in the controllers for the most part
 });

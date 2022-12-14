@@ -385,7 +385,6 @@ function createTimetableFlights(
   route: ServerAirRoute,
 ): ServerTimetableFlight[] {
   const rnd = new PsuedoRandom(route.randomSeed);
-  const randomSeed = rnd.nextSeed();
 
   const baseRoute: AirRoute = {
     origin: route.origin,
@@ -464,7 +463,7 @@ function createTimetableFlights(
       days: days,
       flights: [],
       inflated: [],
-      randomSeed: randomSeed,
+      randomSeed: rnd.nextSeed(),
     };
   });
 }
@@ -502,7 +501,7 @@ function createFlight(
     if (daysTillFlight > 42) {
       bookedPercent = 0;
     } else if (daysTillFlight > 0) {
-      bookedPercent = (bookedPercent * dayOfFlight) / 42;
+      bookedPercent = (bookedPercent * (42 - daysTillFlight)) / 42;
     }
     bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
     return Math.floor((1 - bookedPercent) * capacity(timetableFlight.aircraft));
