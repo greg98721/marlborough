@@ -5,6 +5,8 @@ export interface Flight {
     /** days since 1/12/2022 */
     date: number;
     emptySeats: number;
+    /** NZD */
+    price: number;
     /** Normal JS Date with timezone as this records an event */
     departed: Date | undefined;
     arrived: Date | undefined;

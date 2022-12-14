@@ -36,6 +36,7 @@ function asAirRoute(s: ServerAirRoute): AirRoute {
 
 interface ServerTimetableFlight extends TimetableFlight {
   flights: ServerFlight[];
+  basePrice: number;
   randomSeed: string;
 }
 
@@ -60,6 +61,7 @@ function asFlight(s: ServerFlight): Flight {
     flightNumber: s.flightNumber,
     date: s.date,
     emptySeats: s.emptySeats,
+    price: s.price,
     departed: s.departed,
     arrived: s.arrived,
   };
@@ -402,6 +404,7 @@ function createTimetableFlights(
   }
   const speed = aircraft === 'ATR42' ? 500 : 800;
   const flightTime = route.distance / speed + 0.4; // the 0.4 is landing taxying etc.
+  const basePrice = aircraft === 'ATR42' ? flightTime * 300 : flightTime * 200; // jet is cheaper than turboprop
 
   let currentFlightNumber = route.flightNumberBlock;
 
@@ -463,6 +466,7 @@ function createTimetableFlights(
       days: days,
       flights: [],
       inflated: [],
+      basePrice: basePrice,
       randomSeed: rnd.nextSeed(),
     };
   });
@@ -473,7 +477,7 @@ function createFlight(
   days: number[],
 ): ServerFlight[] {
   const rnd = new PsuedoRandom(timetableFlight.randomSeed);
-  const createEmptySeats = (dayOfFlight: number) => {
+  const createEmptySeatsAndPrice = (dayOfFlight: number) => {
     // TODO calculate number of seats booked - depends on how soon is the flight - size of flight and rush hour
     // use a sin curve for bookings over the 6 weeks before the flight
     let bookedPercent;
@@ -504,7 +508,21 @@ function createFlight(
       bookedPercent = (bookedPercent * (42 - daysTillFlight)) / 42;
     }
     bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
-    return Math.floor((1 - bookedPercent) * capacity(timetableFlight.aircraft));
+
+    let price: number;
+    if (bookedPercent < 0.2) {
+      price = timetableFlight.basePrice * 0.5;
+    } else if (bookedPercent < 0.8) {
+      price = timetableFlight.basePrice * 0.75;
+    } else {
+      price = timetableFlight.basePrice;
+    }
+    return {
+      emptySeats: Math.floor(
+        (1 - bookedPercent) * capacity(timetableFlight.aircraft),
+      ),
+      price: price,
+    };
   };
 
   return days
@@ -519,10 +537,12 @@ function createFlight(
       if (existing !== undefined) {
         return existing;
       } else {
+        const e = createEmptySeatsAndPrice(n);
         return {
           flightNumber: timetableFlight.flightNumber,
           date: n,
-          emptySeats: createEmptySeats(n),
+          emptySeats: e.emptySeats,
+          price: e.price,
           departed: undefined,
           arrived: undefined,
           bookings: [],
