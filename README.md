@@ -41,6 +41,8 @@ ng n marlborough-client --style scss --routing true --skip-git true --skip-insta
 
 In the root packages folder add `packages/marlborough-client` to the workspaces
 
+Add yarn to npm global with `npm i yarn -g`
+
 ## Install Server
 
 [Nest Documentation](https://docs.nestjs.com/cli/usages#nest-new)
@@ -183,5 +185,6 @@ The automatic insertion of imports uses an absolute path - starting at `src/`. T
 
 
 ## Angular Configs
+
 
 Run `ng add @angular/material` to add the material library
