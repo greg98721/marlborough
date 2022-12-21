@@ -180,3 +180,8 @@ See [Typescript project references](https://www.typescriptlang.org/docs/handbook
 
 ## Things To Note
 The automatic insertion of imports uses an absolute path - starting at `src/`. This falls over in Jest testing - better to use relative paths.
+
+
+## Angular Configs
+
+Run `ng add @angular/material` to add the material library
