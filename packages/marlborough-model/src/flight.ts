@@ -1,15 +1,11 @@
-import { PlainDate } from './timetableFlight';
-
 export interface Flight {
-    flightNumber: string;
-    /** days since 1/12/2022 */
-    date: number;
-    emptySeats: number;
-    /** NZD */
-    price: number;
-    /** Normal JS Date with timezone as this records an event */
-    departed: Date | undefined;
-    arrived: Date | undefined;
+  flightNumber: string;
+  date: Date;
+  emptySeats: number;
+  /** NZD */
+  price: number;
+  departed: Date | undefined;
+  arrived: Date | undefined;
 }
 
 export const calendarStart = new Date(2022, 1, 1);

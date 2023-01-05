@@ -1,47 +1,22 @@
-import { getDay } from 'date-fns';
+import { getDay, addMilliseconds, add, formatISOWithOptions, parseISO } from 'date-fns/fp';   // Note using the functional version of the date-fns library
+import { getTimezoneOffset } from 'date-fns-tz';
+
 import { AirRoute } from './airRoute';
 
 export type Aircraft = 'ATR42' | 'A220-100';
 export function capacity(aircraft: Aircraft) { return aircraft === 'ATR42' ? 50 : 110 }
 
-/** A simple date with no time and timezone is that of the airport on that day */
-export interface PlainDate {
-    /** Usual as in 2022 */
-    year: number;
-    /** 1 - 12 */
-    month: number;
-    /** 1 - 31 */
-    day: number;
-}
-
-export function decimalHourToPlainTime(h: number, minuteRounding: number): PlainTime {
-    const hour = Math.floor(h);
-    // round to minutes
-    const minute =
-        Math.floor(((h - hour) * 60) / minuteRounding) * minuteRounding;
-    return { hour: hour, minute: minute };
-}
-
-/** A simple time and timezone is that of the airport on that day.
- * No seconds value as this is just for scheduling
- */
-export interface PlainTime {
-    /** 0 - 23 hours */
-    hour: number;
-    /** 0 - 59 minutes */
-    minute: number;
-}
-
 export interface TimetableFlight {
-    route: AirRoute;
-    aircraft: Aircraft;
-    /** Should be unique in each day */
-    flightNumber: string;
-    departs: PlainTime;
-    /** If earlier than departure - can be assumed to be next day */
-    arrives: PlainTime;
-    /** a 7 bit array - see days below */
-    days: number;
+  route: AirRoute;
+  aircraft: Aircraft;
+  /** Should be unique in each day */
+  flightNumber: string;
+  /** offset from the start of the day in the origin timezone */
+  departs: Duration;
+  /** offset from the start of the timetable day in the destination timezone - could be negative for some flights */
+  arrives: Duration;
+  /** a 7 bit array - see days below */
+  days: number;
 }
 
 export const SUNDAY = 0x01;
@@ -55,13 +30,13 @@ export const WEEKDAYS = MONDAY + TUESDAY + WEDNESDAY + THURSDAY + FRIDAY;
 export const WEEKEND = SUNDAY + SATURDAY;
 
 export function getTimetableDayFromDate(d: Date): number {
-    switch (getDay(d)) {
-        case 0: return SUNDAY;
-        case 1: return MONDAY;
-        case 2: return TUESDAY;
-        case 3: return WEDNESDAY;
-        case 4: return THURSDAY;
-        case 5: return FRIDAY;
-        case 6: return SATURDAY;
-    }
+  switch (getDay(d)) {
+    case 0: return SUNDAY;
+    case 1: return MONDAY;
+    case 2: return TUESDAY;
+    case 3: return WEDNESDAY;
+    case 4: return THURSDAY;
+    case 5: return FRIDAY;
+    case 6: return SATURDAY;
+  }
 }

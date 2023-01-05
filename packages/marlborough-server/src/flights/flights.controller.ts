@@ -9,9 +9,7 @@ export class FlightsController {
   getFlights(
     @Query('origin') origin: string,
     @Query('dest') dest: string,
-    @Query('from') from: string,
-    @Query('till') till: string,
   ): string {
-    return this.scheduleService.getFlights(origin, dest, from, till);
+    return this.scheduleService.getFlights(origin, dest);
   }
 }

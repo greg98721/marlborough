@@ -1,24 +1,48 @@
-import { addDays, differenceInCalendarDays } from 'date-fns';
+import { addMilliseconds, addDays, add } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { getTimezoneOffset } from 'date-fns-tz';
 
 import {
   Aircraft,
   Airport,
   AirRoute,
-  calendarStart,
   capacity,
-  decimalHourToPlainTime,
   Flight,
   getTimetableDayFromDate,
   TimetableFlight,
+  timezone,
   WEEKDAYS,
   WEEKEND,
 } from '@marlborough/model';
 import { PsuedoRandom } from './psuedoRandom';
 
+export function addDuration(a: Duration, b: Duration): Duration {
+  const undefAdd = (
+    p: number | undefined,
+    q: number | undefined,
+  ): number | undefined => {
+    if (p === undefined && q === undefined) {
+      return undefined;
+    } else {
+      return (p ?? 0) + (q ?? 0);
+    }
+  };
+
+  return {
+    years: undefAdd(a.years, b.years),
+    months: undefAdd(a.months, b.months),
+    weeks: undefAdd(a.weeks, b.weeks),
+    days: undefAdd(a.days, b.days),
+    hours: undefAdd(a.hours, b.hours),
+    minutes: undefAdd(a.minutes, b.minutes),
+    seconds: undefAdd(a.seconds, b.seconds),
+  };
+}
+
 export interface Schedule {
   routes: ServerAirRoute[];
   randomSeed: string;
 }
+
 interface ServerAirRoute extends AirRoute {
   timetableFlights: ServerTimetableFlight[] | undefined;
   intensity: 1 | 2 | 3;
@@ -35,7 +59,7 @@ function asAirRoute(s: ServerAirRoute): AirRoute {
 }
 
 interface ServerTimetableFlight extends TimetableFlight {
-  flights: ServerFlight[];
+  flights: ServerFlight[] | undefined;
   basePrice: number;
   randomSeed: string;
 }
@@ -50,6 +74,7 @@ function asTimetableFlight(s: ServerTimetableFlight): TimetableFlight {
     days: s.days,
   };
 }
+
 interface ServerFlight extends Flight {
   /** Only the manually added ones - simulate with EmptySeats field otherwise */
   bookings: ServerFlight[];
@@ -108,25 +133,37 @@ export function getFlights(
   schedule: Schedule,
   origin: Airport,
   destination: Airport,
-  from: Date,
-  till: Date,
-): { t: TimetableFlight; f: Flight[] }[] {
+): { timetableFlight: TimetableFlight; flights: Flight[] }[] {
   const route = schedule.routes.find(
     (r) => r.origin === origin && r.destination === destination,
   );
-  const fn = differenceInCalendarDays(from, calendarStart);
-  const tn = differenceInCalendarDays(till, calendarStart);
-  const days = Array.from({ length: tn - fn + 1 }, (_, i) => fn + i);
+
   if (route !== undefined) {
     if (route.timetableFlights === undefined) {
       route.timetableFlights = createTimetableFlights(route);
     }
+
+    const todayLocal = new Date();
+    const todayUTC = new Date(
+      Date.UTC(
+        todayLocal.getFullYear(),
+        todayLocal.getMonth(),
+        todayLocal.getDate(),
+        0,
+        0,
+        0,
+      ),
+    );
+
     return route.timetableFlights
       .map((t) => {
-        const flights = createFlight(t, days).map((f) => asFlight(f));
-        return { t: asTimetableFlight(t), f: flights };
+        if (t.flights === undefined) {
+          t.flights = createFlights(todayUTC, t);
+        }
+        const flights = t.flights.map((f) => asFlight(f));
+        return { timetableFlight: asTimetableFlight(t), flights: flights };
       })
-      .filter((d) => d.f.length > 0);
+      .filter((d) => d.flights.length > 0);
   } else {
     return [];
   }
@@ -403,22 +440,25 @@ function createTimetableFlights(
     aircraft = 'A220-100';
   }
   const speed = aircraft === 'ATR42' ? 500 : 800;
-  const flightTime = route.distance / speed + 0.4; // the 0.4 is landing taxying etc.
+  const flightTime = (route.distance / speed) * 60.0 + 25; // the 25 min is landing taxying etc.
   const basePrice = aircraft === 'ATR42' ? flightTime * 300 : flightTime * 200; // jet is cheaper than turboprop
+  const flightDuration: Duration = { minutes: flightTime };
 
   let currentFlightNumber = route.flightNumberBlock;
 
-  const depatureTimes: [number, number][] = []; // day, decimal hour
+  const depatureTimes: { days: number; duration: Duration }[] = [];
 
   const divideDay = (days: number, n: number, fromT: number, toT: number) => {
     if (n === 0) {
       return;
     }
     for (let i = 0; i < n; i++) {
-      const h0 = (i * (toT - fromT)) / n + fromT;
-      const h1 = h0 + (toT - fromT) / n;
-      const h = rnd.gaussian(h0, h1);
-      depatureTimes.push([days, h]);
+      const r0 = (i * (toT - fromT)) / n + fromT;
+      const r1 = r0 + (toT - fromT) / n;
+      const r = rnd.gaussian(r0, r1);
+      const h = Math.floor(r);
+      const m = Math.floor((r - h) * 60.0);
+      depatureTimes.push({ days: days, duration: { hours: h, minutes: m } });
     }
   };
 
@@ -450,10 +490,7 @@ function createTimetableFlights(
   }
 
   return depatureTimes.map((t) => {
-    const days = t[0];
-    const h = t[1];
-    const departs = decimalHourToPlainTime(h, 5);
-    const arrives = decimalHourToPlainTime(h + flightTime, 1);
+    const arrives = addDuration(t.duration, flightDuration);
     const flightNumber = `MA${currentFlightNumber.toString().padStart(3, '0')}`;
     currentFlightNumber++;
 
@@ -461,28 +498,30 @@ function createTimetableFlights(
       route: baseRoute,
       aircraft: aircraft,
       flightNumber: flightNumber,
-      departs: departs,
+      departs: t.duration,
       arrives: arrives,
-      days: days,
-      flights: [],
-      inflated: [],
+      days: t.days,
+      flights: undefined,
       basePrice: basePrice,
       randomSeed: rnd.nextSeed(),
     };
   });
 }
 
-function createFlight(
+function createFlights(
+  today: Date,
   timetableFlight: ServerTimetableFlight,
-  days: number[],
 ): ServerFlight[] {
   const rnd = new PsuedoRandom(timetableFlight.randomSeed);
-  const createEmptySeatsAndPrice = (dayOfFlight: number) => {
+  const numDays = 42; // create 6 weeks out
+  const tz = timezone(timetableFlight.route.origin);
+
+  const createEmptySeatsAndPrice = (daysTillFlight: number) => {
     // TODO calculate number of seats booked - depends on how soon is the flight - size of flight and rush hour
     // use a sin curve for bookings over the 6 weeks before the flight
-    let bookedPercent;
+    let bookedPercent: number;
     // adjust relative to time of day
-    switch (timetableFlight.departs.hour) {
+    switch (timetableFlight.departs.hours ?? 0) {
       case 7:
       case 8:
       case 16:
@@ -500,14 +539,13 @@ function createFlight(
         bookedPercent = rnd.flat(0.4, 0.75);
         break;
     }
-    const daysTillFlight =
-      dayOfFlight - differenceInCalendarDays(new Date(), calendarStart);
-    if (daysTillFlight > 42) {
+    if (daysTillFlight > numDays) {
       bookedPercent = 0;
     } else if (daysTillFlight > 0) {
-      bookedPercent = (bookedPercent * (42 - daysTillFlight)) / 42;
+      bookedPercent = (bookedPercent * (numDays - daysTillFlight)) / numDays;
+    } else {
+      bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
     }
-    bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
 
     let price: number;
     if (bookedPercent < 0.2) {
@@ -525,29 +563,38 @@ function createFlight(
     };
   };
 
-  return days
-    .filter((n) => {
+  /** The time of the PlainDate is 00:00 UTC so adjust to 00:00 in the local timezone before adding time */
+  const createLocalDateTime = (d: Date, t: Duration): Date => {
+    const localOffset = getTimezoneOffset(tz, d); // note use the date to cope with daylight savings changes
+    const localMidnight = addMilliseconds(-localOffset, d);
+    return add(t, localMidnight);
+  };
+
+  const dayOffsets = [...Array(numDays).keys()].map((i) => i + 1); // we want a base 1 list as will not book a flight for today
+
+  // could not use eachDayOfInterval here as it does not cope with timezones very well
+
+  return dayOffsets
+    .map((o) => {
+      const day = addDays(o, today);
+      return { daysTillFlight: o, day: day };
+    })
+    .filter((d) => {
       // first filter the days when there is no flight
-      const d = addDays(calendarStart, n);
-      const t = getTimetableDayFromDate(d);
+      const t = getTimetableDayFromDate(d.day);
       return (t & timetableFlight.days) > 0;
     })
-    .map((n) => {
-      const existing = timetableFlight.flights.find((f) => f.date === n);
-      if (existing !== undefined) {
-        return existing;
-      } else {
-        const e = createEmptySeatsAndPrice(n);
-        return {
-          flightNumber: timetableFlight.flightNumber,
-          date: n,
-          emptySeats: e.emptySeats,
-          price: e.price,
-          departed: undefined,
-          arrived: undefined,
-          bookings: [],
-          randomSeed: rnd.nextSeed(),
-        };
-      }
+    .map((d) => {
+      const e = createEmptySeatsAndPrice(d.daysTillFlight);
+      return {
+        flightNumber: timetableFlight.flightNumber,
+        date: createLocalDateTime(d.day, timetableFlight.departs),
+        emptySeats: e.emptySeats,
+        price: e.price,
+        departed: undefined,
+        arrived: undefined,
+        bookings: [],
+        randomSeed: rnd.nextSeed(),
+      };
     });
 }

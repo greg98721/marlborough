@@ -1,4 +1,3 @@
-import { addDays } from 'date-fns';
 import { TimetableFlight } from '@marlborough/model';
 
 import {
@@ -61,13 +60,7 @@ describe('Schedule', () => {
   });
 
   it('can create flights over the next 7 days', () => {
-    const flights = getFlights(
-      schedule,
-      'NZWB',
-      'NZWN',
-      new Date(),
-      addDays(new Date(), 7),
-    );
+    const flights = getFlights(schedule, 'NZWB', 'NZWN');
     expect(flights.length).toBeGreaterThan(0);
   });
 });
