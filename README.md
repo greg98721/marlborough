@@ -188,3 +188,59 @@ The automatic insertion of imports uses an absolute path - starting at `src/`. T
 
 
 Run `ng add @angular/material` to add the material library
+
+# Angular Standalone Components
+
+I am assuming this is the future direction of Angular so will avoid the use of ng modules in the app. Add the following standalone flag to angular.json to make all new components standalone by default.
+```json
+  "projects": {
+    "marlborough-client": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "standalone": true
+        }
+      },
+```
+
+## Bootstrapping the App without a Module
+
+In main.ts replace the existing code with the following
+
+``` typescript
+bootstrapApplication(AppComponent)
+  .catch(err => console.error(err));
+```
+
+In AppComponent.ts add the standalone and imports fields to the component declaration
+
+``` typescript
+@Component({
+  standalone: true,
+  selector: 'app-root',
+  imports: [ CommonModule, RouterModule ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
+```
+
+## Routing without a routing module
+
+* See the [Angular docs](https://angular.io/guide/standalone-components#routing-and-lazy-loading)
+
+Add app.routes.ts file to contain the base routes. These will be used in the bootstrap code in main.ts
+
+```typescript
+import { AppComponent } from './app/app.component';
+import { ROUTES } from './app/app.routes';
+import { FlightService } from './app/services/flight.service';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(ROUTES),
+    { provide: FlightService, useClass: FlightService}
+  ]
+})
+  .catch(err => console.error(err));
+  ```
