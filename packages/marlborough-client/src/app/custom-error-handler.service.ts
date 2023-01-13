@@ -6,14 +6,14 @@ export class CustomErrorHandler implements ErrorHandler {
 
   constructor(private snackbar: MatSnackBar, private zone: NgZone) { }
   // Note the NgZone - because this runs outside of the normal Angular zone - have to provide our own to enable timeouts and button handling
-
+  // Also in the dark them there is poor contrast on the close button - seems to be an open issue
   handleError(error: unknown) {
     this.zone.run(() => {
       this.snackbar.open(
-        'Error was detected! We are already working on it!',
+        'Error was detected! Details in the console',
         'Close',
         {
-          duration: 2000
+          duration: 8000
         }
       );
     })

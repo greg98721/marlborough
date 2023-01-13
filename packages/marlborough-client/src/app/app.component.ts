@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { delay } from 'rxjs';
+import { delay, Observable, Subject } from 'rxjs';
 import { LoadingOverlayComponent } from './components/loading-overlay/loading-overlay.component';
 import { LoadingService } from './services/loading.service';
 
@@ -14,15 +14,13 @@ import { LoadingService } from './services/loading.service';
 })
 export class AppComponent implements OnInit {
   title = 'Marlborough';
-  loading: boolean = false;
+  isLoading: Observable<boolean>;
 
-  constructor(private _loading: LoadingService) { }
+  constructor(private _loadingService: LoadingService) {
+    this.isLoading = this._loadingService.isLoading;
+  }
 
   ngOnInit(): void {
-    this._loading.loadingSub.pipe(
-      delay(0)) // This prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
-      .subscribe((loading) => {
-        this.loading = loading;
-      });
+    // this.isLoading = this._loadingService.isLoading.pipe(delay(0)); // delay prevents a ExpressionChangedAfterItHasBeenCheckedError for subsequent requests
   }
 }

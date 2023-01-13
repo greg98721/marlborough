@@ -6,11 +6,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppComponent } from './app/app.component';
-import { ROUTES } from './app/app.routes';
+import { ROUTES } from './app/routing/app.routes';
 import { CustomErrorHandler } from './app/custom-error-handler.service';
 import { GlobalHttpErrorHandler } from './app/global-http-error-handler.interceptor';
 import { FlightService } from './app/services/flight.service';
-import { HttpRequestInterceptor } from './app/http-loading-interceptor';
 
 
 /*
@@ -34,11 +33,6 @@ bootstrapApplication(AppComponent, {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: GlobalHttpErrorHandler,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpRequestInterceptor,
       multi: true
     },
     { provide: FlightService, useClass: FlightService }
