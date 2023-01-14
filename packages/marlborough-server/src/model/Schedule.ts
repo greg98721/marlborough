@@ -7,9 +7,15 @@ import {
   AirRoute,
   capacity,
   Flight,
+  FRIDAY,
   getTimetableDayFromDate,
+  MONDAY,
+  SATURDAY,
+  SUNDAY,
+  THURSDAY,
   TimetableFlight,
   timezone,
+  WEDNESDAY,
   WEEKDAYS,
   WEEKEND,
 } from '@marlborough/model';
@@ -45,7 +51,7 @@ export interface Schedule {
 
 interface ServerAirRoute extends AirRoute {
   timetableFlights: ServerTimetableFlight[] | undefined;
-  intensity: 1 | 2 | 3;
+  intensity: 0 | 1 | 2 | 3;
   distance: number;
   flightNumberBlock: number;
   randomSeed: string;
@@ -396,6 +402,24 @@ function createRoutes(rnd: PsuedoRandom): ServerAirRoute[] {
       flightNumberBlock: 0,
       randomSeed: rnd.nextSeed(),
     },
+    {
+      origin: 'NZWN',
+      destination: 'NZCI',
+      distance: 765,
+      timetableFlights: undefined,
+      intensity: 0,
+      flightNumberBlock: 0,
+      randomSeed: rnd.nextSeed(),
+    },
+    {
+      origin: 'NZCH',
+      destination: 'NZCI',
+      distance: 885,
+      timetableFlights: undefined,
+      intensity: 0,
+      flightNumberBlock: 0,
+      randomSeed: rnd.nextSeed(),
+    },
   ];
 
   // create the flight number blocks sequentially in blocks of 20
@@ -446,7 +470,14 @@ function createTimetableFlights(
 
   let currentFlightNumber = route.flightNumberBlock;
 
-  const depatureTimes: { days: number; duration: Duration }[] = [];
+  const depatureTimes: { days: number; departure: Duration }[] = [];
+
+  const randomTimeWithinInterval = (r0: number, r1: number): Duration => {
+    const r = rnd.gaussian(r0, r1);
+    const h = Math.floor(r);
+    const m = Math.floor((r - h) * 60.0);
+    return { hours: h, minutes: m };
+  };
 
   const divideDay = (days: number, n: number, fromT: number, toT: number) => {
     if (n === 0) {
@@ -455,14 +486,20 @@ function createTimetableFlights(
     for (let i = 0; i < n; i++) {
       const r0 = (i * (toT - fromT)) / n + fromT;
       const r1 = r0 + (toT - fromT) / n;
-      const r = rnd.gaussian(r0, r1);
-      const h = Math.floor(r);
-      const m = Math.floor((r - h) * 60.0);
-      depatureTimes.push({ days: days, duration: { hours: h, minutes: m } });
+      const d = randomTimeWithinInterval(r0, r1);
+      depatureTimes.push({ days: days, departure: d });
     }
   };
 
   switch (route.intensity) {
+    case 0:
+      // Intensity 0: 3 time per week
+      const days = rnd.withinPrecent(50)
+        ? MONDAY + THURSDAY + SATURDAY
+        : SUNDAY + WEDNESDAY + FRIDAY;
+      const dep = randomTimeWithinInterval(10, 16);
+      depatureTimes.push({ days: days, departure: dep });
+      break;
     case 1:
       // Intensity 1: Every week day and maybe weekends - 1 or 2 flights per day
       const wd1 = rnd.withinPrecent(70) ? 2 : 1;
@@ -490,7 +527,7 @@ function createTimetableFlights(
   }
 
   return depatureTimes.map((t) => {
-    const arrives = addDuration(t.duration, flightDuration);
+    const arrives = addDuration(t.departure, flightDuration);
     const flightNumber = `MA${currentFlightNumber.toString().padStart(3, '0')}`;
     currentFlightNumber++;
 
@@ -498,7 +535,7 @@ function createTimetableFlights(
       route: baseRoute,
       aircraft: aircraft,
       flightNumber: flightNumber,
-      departs: t.duration,
+      departs: t.departure,
       arrives: arrives,
       days: t.days,
       flights: undefined,

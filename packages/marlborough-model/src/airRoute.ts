@@ -1,5 +1,5 @@
 // We need to create a type guard for airports so we need to do a bit of work - see https://www.qualdesk.com/blog/2021/type-guard-for-string-union-types-typescript/
-const AIRPORTS = ['NZAA', 'NZCH', 'NZDN', 'NZHK', 'NZNP', 'NZNR', 'NZNS', 'NZPM', 'NZQN', 'NZTG', 'NZWB', 'NZWN'] as const;
+const AIRPORTS = ['NZAA', 'NZCH', 'NZDN', 'NZHK', 'NZNP', 'NZNR', 'NZNS', 'NZPM', 'NZQN', 'NZTG', 'NZWB', 'NZWN', 'NZCI'] as const;
 export type Airport = typeof AIRPORTS[number];
 export function isAirport(airport: string): airport is Airport {
   return AIRPORTS.includes(airport as Airport)
@@ -19,12 +19,16 @@ export function cityName(a: Airport): string {
     case 'NZTG': return 'Tauranga';
     case 'NZWB': return 'Blenheim';
     case 'NZWN': return 'Wellington';
+    case 'NZCI': return 'Chatham Islands'
   }
 }
 
-export function timezone(_: Airport): string {
-  // for now everything is in NZ - but project can cope with other countries
-  return 'Pacific/Auckland';
+export function timezone(airport: Airport): string {
+  if (airport === 'NZCI') {
+    return 'Pacific/Chatham';
+  } else {
+    return 'Pacific/Auckland';
+  }
 }
 
 /** should be route but want to avoid any mix up with angular routing */
