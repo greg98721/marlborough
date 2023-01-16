@@ -24,7 +24,7 @@ describe('Schedule', () => {
     const airports = getOrigins(schedule);
     expect(airports).toContain('NZDN');
     expect(airports).toContain('NZWB');
-    expect(airports.length).toBe(12);
+    expect(airports.length).toBe(13);
   });
 
   it('Dunedin has a set of routes starting there', () => {
@@ -42,9 +42,9 @@ describe('Schedule', () => {
     const christchurch = timetable.filter(
       (t) => t.route.destination === 'NZCH',
     );
-    expect(wellington.length).toBe(7);
-    expect(nelson.length).toBe(2);
-    expect(christchurch.length).toBe(7);
+    expect(wellington.length).toBe(6);
+    expect(nelson.length).toBe(3);
+    expect(christchurch.length).toBe(8);
   };
 
   it('can get full timetable for Dunedin', () => {
