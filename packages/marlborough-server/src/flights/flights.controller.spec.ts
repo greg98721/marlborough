@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ScheduleService } from '../schedule/schedule.service';
 import { FlightsController } from './flights.controller';
-import { Flight, TimetableFlight } from '@marlborough/model';
 
 describe('FlightsController', () => {
   let controller: FlightsController;

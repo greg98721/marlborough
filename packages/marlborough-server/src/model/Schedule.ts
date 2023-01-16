@@ -1,4 +1,4 @@
-import { addMilliseconds, addMinutes, addDays, add } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { addMilliseconds, addMinutes, addDays } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
 
 import {

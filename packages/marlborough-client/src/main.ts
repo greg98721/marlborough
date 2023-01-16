@@ -19,9 +19,6 @@ if (environment.production) {
 }
 */
 
-export function appConfigServiceFactory(service: AppConfigService): Function {
-  return () => service.load();
-}
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -32,10 +29,10 @@ bootstrapApplication(AppComponent, {
     ),
     {
       provide: APP_INITIALIZER,
-      useFactory: appConfigServiceFactory,
       deps: [
         AppConfigService
       ],
+      useFactory: (service: AppConfigService) => () => service.load(),
       multi: true
     },
     provideRouter(ROUTES),

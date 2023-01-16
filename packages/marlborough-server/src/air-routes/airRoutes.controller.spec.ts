@@ -1,4 +1,3 @@
-import { Airport, AirRoute } from '@marlborough/model';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ScheduleService } from '../schedule/schedule.service';
 import { AirRoutesController } from './airRoutes.controller';
