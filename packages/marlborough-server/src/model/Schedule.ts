@@ -1,4 +1,4 @@
-import { addMilliseconds, addDays, add } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { addMilliseconds, addMinutes, addDays, add } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
 
 import {
@@ -20,29 +20,6 @@ import {
   WEEKEND,
 } from '@marlborough/model';
 import { PsuedoRandom } from './psuedoRandom';
-
-export function addDuration(a: Duration, b: Duration): Duration {
-  const undefAdd = (
-    p: number | undefined,
-    q: number | undefined,
-  ): number | undefined => {
-    if (p === undefined && q === undefined) {
-      return undefined;
-    } else {
-      return (p ?? 0) + (q ?? 0);
-    }
-  };
-
-  return {
-    years: undefAdd(a.years, b.years),
-    months: undefAdd(a.months, b.months),
-    weeks: undefAdd(a.weeks, b.weeks),
-    days: undefAdd(a.days, b.days),
-    hours: undefAdd(a.hours, b.hours),
-    minutes: undefAdd(a.minutes, b.minutes),
-    seconds: undefAdd(a.seconds, b.seconds),
-  };
-}
 
 export interface Schedule {
   routes: ServerAirRoute[];
@@ -465,18 +442,15 @@ function createTimetableFlights(
   }
   const speed = aircraft === 'ATR42' ? 500 : 800;
   const flightTime = (route.distance / speed) * 60.0 + 25; // the 25 min is landing taxying etc.
-  const basePrice = aircraft === 'ATR42' ? flightTime * 300 : flightTime * 200; // jet is cheaper than turboprop
-  const flightDuration: Duration = { minutes: flightTime };
+  const basePrice = aircraft === 'ATR42' ? flightTime * 2 : flightTime * 1.2; // jet is cheaper than turboprop
+  const flightDuration = flightTime;
 
   let currentFlightNumber = route.flightNumberBlock;
 
-  const depatureTimes: { days: number; departure: Duration }[] = [];
+  const depatureTimes: { days: number; departure: number }[] = [];
 
-  const randomTimeWithinInterval = (r0: number, r1: number): Duration => {
-    const r = rnd.gaussian(r0, r1);
-    const h = Math.floor(r);
-    const m = Math.floor((r - h) * 60.0);
-    return { hours: h, minutes: m };
+  const randomTimeWithinInterval = (r0: number, r1: number): number => {
+    return rnd.gaussian(r0, r1) * 60.0;
   };
 
   const divideDay = (days: number, n: number, fromT: number, toT: number) => {
@@ -527,7 +501,7 @@ function createTimetableFlights(
   }
 
   return depatureTimes.map((t) => {
-    const arrives = addDuration(t.departure, flightDuration);
+    const arrives = t.departure + flightDuration;
     const flightNumber = `MA${currentFlightNumber.toString().padStart(3, '0')}`;
     currentFlightNumber++;
 
@@ -558,7 +532,8 @@ function createFlights(
     // use a sin curve for bookings over the 6 weeks before the flight
     let bookedPercent: number;
     // adjust relative to time of day
-    switch (timetableFlight.departs.hours ?? 0) {
+    const hours = Math.floor(timetableFlight.departs / 60);
+    switch (hours ?? 0) {
       case 7:
       case 8:
       case 16:
@@ -601,10 +576,10 @@ function createFlights(
   };
 
   /** The time of the PlainDate is 00:00 UTC so adjust to 00:00 in the local timezone before adding time */
-  const createLocalDateTime = (d: Date, t: Duration): Date => {
+  const createLocalDateTime = (d: Date, minutes: number): Date => {
     const localOffset = getTimezoneOffset(tz, d); // note use the date to cope with daylight savings changes
     const localMidnight = addMilliseconds(-localOffset, d);
-    return add(t, localMidnight);
+    return addMinutes(minutes, localMidnight);
   };
 
   const dayOffsets = [...Array(numDays).keys()].map((i) => i + 1); // we want a base 1 list as will not book a flight for today

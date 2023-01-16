@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { timer, map } from 'rxjs';
 import { LoadingService } from 'src/app/services/loading.service';
+import { FlightService } from 'src/app/services/flight.service';
 
 @Component({
   selector: 'app-home-page',
@@ -10,10 +11,18 @@ import { LoadingService } from 'src/app/services/loading.service';
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.scss']
 })
-export class HomePageComponent {
+export class HomePageComponent implements OnInit {
 
-  constructor(private _loadingService: LoadingService) { }
+  constructor(private _flightService: FlightService) { }
 
+  ngOnInit(): void {
+    // when we start grab the images for the destinations page early to let appear instant
+    this._flightService.getOrigins().subscribe(o => {
+      const x = o;
+    });
+  }
+
+  /*
   testLoading() {
     let t1 = timer(4000);
     this._loadingService.setLoadingWhile(t1).subscribe(() => console.info('1 happened'));
@@ -28,4 +37,5 @@ export class HomePageComponent {
     );
     this._loadingService.setLoadingWhile(t4).subscribe(() => console.info('4 happened'));
   }
+  */
 }

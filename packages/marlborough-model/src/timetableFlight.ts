@@ -11,10 +11,10 @@ export interface TimetableFlight {
   aircraft: Aircraft;
   /** Should be unique in each day */
   flightNumber: string;
-  /** offset from the start of the day in the origin timezone */
-  departs: Duration;
-  /** offset from the start of the timetable day in the destination timezone - could be negative for some flights */
-  arrives: Duration;
+  /** offset in minutes from the start of the day in the origin timezone */
+  departs: number;
+  /** offset in minutes from the start of the timetable day in the destination timezone - could be negative for some flights */
+  arrives: number;
   /** a 7 bit array - see days below */
   days: number;
 }

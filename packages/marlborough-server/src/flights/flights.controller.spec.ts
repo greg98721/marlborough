@@ -20,8 +20,7 @@ describe('FlightsController', () => {
   });
 
   it('should return a list of flights', () => {
-    const j = controller.getFlights('NZWB', 'NZWN');
-    const flights = JSON.parse(j) as { t: TimetableFlight; f: Flight[] }[];
+    const flights = controller.getFlights('NZWB', 'NZWN');
     expect(flights.length).toBeGreaterThan(0);
   });
 });
