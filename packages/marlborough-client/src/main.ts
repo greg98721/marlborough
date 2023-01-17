@@ -32,7 +32,7 @@ bootstrapApplication(AppComponent, {
       deps: [
         AppConfigService
       ],
-      useFactory: (service: AppConfigService) => () => service.load(),
+      useFactory: (service: AppConfigService) => () => service.load(),  // we are setting the function here - not running it
       multi: true
     },
     provideRouter(ROUTES),
