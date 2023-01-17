@@ -1,3 +1,4 @@
+@use 'sass:map';
 @use "@angular/material" as mat;
 @include mat.core();
 
@@ -11,7 +12,10 @@
 
 $my-typography: mat.define-typography-config(
   $font-family: "Mona Sans",
+  $headline-1: mat.define-typography-level(10vw, 12vw, 200, $letter-spacing: 0.05rem),
+  $headline-4: mat.define-typography-level(4vw, 5vw, 300),
 );
+
 @include mat.all-component-typographies($my-typography);
 
 $dark-theme: mat.define-dark-theme(
@@ -38,18 +42,63 @@ $light-theme: mat.define-light-theme(
 
 // By default use the dark theme...
 @include mat.all-component-themes($dark-theme);
+$color-config:    mat.get-color-config($dark-theme);
 
 // ... unless the user wants the light theme
 @media (prefers-color-scheme: light) {
   // note we are only overloading the colours here
   @include mat.all-component-colors($light-theme);
+  $color-config:    mat.get-color-config($light-theme);
 }
+
+
+$primary-palette: map.get($color-config, 'primary');
+$accent-palette:  map.get($color-config, 'accent');
+$warn-palette:    map.get($color-config, 'warn');
+$is-dark-theme:   map.get($color-config, 'is-dark');
 
 html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
+}
+
+a, a:visited {
+  color: mat.get-color-from-palette($accent-palette, 500);
+  text-decoration: none;
+}
+
+a:hover {
+  color: mat.get-color-from-palette($accent-palette, A200);
+  text-decoration: underline;
+}
+
+.adjust-width {
+  font-stretch: 125%,
+}
+
+.vertical-centre {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.basic-flex-item {
+  flex: 0 0 auto;
+}
+
+.optional-wrap {
+  flex: 0 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
 }
