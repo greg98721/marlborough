@@ -16,4 +16,10 @@ export class AirRoutesController {
   getRoutes(@Param('origin') origin: string) {
     return this.scheduleService.getRoutes(origin);
   }
+
+  @Get('timetable/:origin')
+  @Header('Cache-Control', 'max-age=3600')
+  getTimetable(@Param('origin') origin: string) {
+    return this.scheduleService.getTimetable(origin);
+  }
 }

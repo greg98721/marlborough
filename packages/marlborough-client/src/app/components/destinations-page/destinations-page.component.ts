@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FlightService } from 'src/app/services/flight.service';
 import { Observable, map } from 'rxjs';
 import { Airport, cityName } from '@marlborough/model';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-destinations-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './destinations-page.component.html',
   styleUrls: ['./destinations-page.component.scss']
 })

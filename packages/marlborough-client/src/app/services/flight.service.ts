@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Airport, isAirport } from '@marlborough/model';
+import { Airport, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
 import { AppConfigService } from './app-config.service';
 
@@ -21,7 +21,23 @@ export class FlightService {
           // this is mainly to catch the server and client being out of synch in list of airports
           return rawList as Airport[];
         } else {
-          throw new TypeError('Invalid airport in getting list from server');
+          throw new TypeError('Invalid airport in getting list of origins from server');
+        }
+      }),
+      catchError(_ => []) // we have proper http error handling higher up the stack - for here keep things polite
+    )
+  }
+
+  getTimetable(origin: string): Observable<TimetableFlight[]> {
+    const url = this._config.apiUrl(`routes/timetable/${origin}`);
+    return this._http.get(url).pipe(
+      map(response => {
+        const rawList = response as any[];
+        if (rawList.every(t => isAirport(t.route.destination) && isAirport(t.route.origin))) {
+          // this is mainly to catch the server and client being out of synch in list of airports
+          return rawList as TimetableFlight[];
+        } else {
+          throw new TypeError(`Invalid airport in getting list of timetables for ${origin} from server`);
         }
       }),
       catchError(_ => []) // we have proper http error handling higher up the stack - for here keep things polite

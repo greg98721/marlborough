@@ -3,8 +3,12 @@
     <img
       srcset="assets/destinations/{{origin}}-300.jpg 300w, assets/destinations/{{origin}}-600.jpg 600w, assets/destinations/{{origin}}-1200.jpg 1200w"
       sizes="(max-width: 400px) 300px, (max-width: 800px) 600px, 1200px" src="assets/destinations/{{origin}}-300.jpg"
-      alt="Advertising picture of {{origin}}" class="pretty-picture" />
-    <div class="mat-headline-4 adjust-width">{{destinationName(origin)}}</div>
-    <div>{{destinationFluff(origin)}}</div>
+      alt="Advertising picture of {{origin}}" class="pretty-picture adjust-image" />
+    <div class="text-container">
+      <div class="mat-headline-4 adjust-width city-name">{{destinationName(origin)}}</div>
+      <div class="fluff">{{destinationFluff(origin)}}</div>
+      <a [routerLink]="['/timetable', origin]" class="goto-timetable mat-headline-6">See the timetable</a>
+      <div class="book-now mat-headline-6">Book Now</div>
+    </div>
   </div>
 </div>

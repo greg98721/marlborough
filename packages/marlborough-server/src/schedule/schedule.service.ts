@@ -5,6 +5,7 @@ import {
   getFlights,
   getOrigins,
   getRoutes,
+  getTimetable,
   Schedule,
 } from '../model/schedule';
 
@@ -27,6 +28,17 @@ export class ScheduleService {
     } else {
       throw new TypeError(
         `Tried to convert a non valid airport code ${origin} when getting list of routes`,
+      );
+    }
+  }
+
+  getTimetable(origin: string) {
+    if (isAirport(origin)) {
+      const o = origin as Airport;
+      return getTimetable(this._schedule, o);
+    } else {
+      throw new TypeError(
+        `Tried to convert a non valid airport code ${origin} when getting list of timetables`,
       );
     }
   }

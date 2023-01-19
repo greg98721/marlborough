@@ -26,6 +26,10 @@ a:hover {
   font-stretch: 125%,
 }
 
+.adjust-image {
+  filter: brightness(70%) contrast(125%);
+}
+
 .vertical-centre {
   width: 100%;
   margin: 0;

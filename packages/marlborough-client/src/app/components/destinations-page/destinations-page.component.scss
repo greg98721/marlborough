@@ -1,4 +1,42 @@
+@use "@angular/material" as mat;
+@import '../../../theme.scss';
+
 .pretty-picture {
   width: 80vw;
   height: 40vw;
+  margin-left: 10vw;
+}
+
+div.mat-headline-4 {
+  margin-bottom: 0;
+}
+
+.text-container {
+  width: 80vw;
+  margin-left: 10vw;
+  margin-bottom: 2vw;
+  display: grid;
+  grid-template-columns: 1fr 0.5fr 0.5fr;
+  grid-template-rows: max-content max-content;
+}
+
+.city-name {
+  grid-column: 1;
+  grid-row: 1;
+  color: mat.get-color-from-palette($primary-palette, A200);
+}
+
+.fluff {
+  grid-column: 2 / span 2;
+  grid-row: 1;
+}
+
+.goto-timetable {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.book-now {
+  grid-column: 3;
+  grid-row: 2;
 }
