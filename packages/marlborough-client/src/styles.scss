@@ -1,61 +1,6 @@
-@use 'sass:map';
 @use "@angular/material" as mat;
-@include mat.core();
-
-@font-face {
-  font-family: "Mona Sans";
-  src: url("assets/Mona-Sans.woff2") format("woff2 supports variations"),
-    url("assets/Mona-Sans.woff2") format("woff2-variations");
-  font-weight: 200 900;
-  font-stretch: 75% 125%;
-}
-
-$my-typography: mat.define-typography-config(
-  $font-family: "Mona Sans",
-  $headline-1: mat.define-typography-level(10vw, 12vw, 200, $letter-spacing: 0.05rem),
-  $headline-4: mat.define-typography-level(4vw, 5vw, 300),
-);
-
-@include mat.all-component-typographies($my-typography);
-
-$dark-theme: mat.define-dark-theme(
-  (
-    color: (
-      primary: mat.define-palette(mat.$deep-purple-palette),
-      accent: mat.define-palette(mat.$cyan-palette),
-      warn: mat.define-palette(mat.$red-palette),
-    ),
-    // Only include `density` in the default dark theme.
-    density: 0,
-  )
-);
-
-$light-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: mat.define-palette(mat.$deep-purple-palette),
-      accent: mat.define-palette(mat.$cyan-palette),
-      warn: mat.define-palette(mat.$red-palette),
-    ),
-  )
-);
-
-// By default use the dark theme...
-@include mat.all-component-themes($dark-theme);
-$color-config:    mat.get-color-config($dark-theme);
-
-// ... unless the user wants the light theme
-@media (prefers-color-scheme: light) {
-  // note we are only overloading the colours here
-  @include mat.all-component-colors($light-theme);
-  $color-config:    mat.get-color-config($light-theme);
-}
-
-
-$primary-palette: map.get($color-config, 'primary');
-$accent-palette:  map.get($color-config, 'accent');
-$warn-palette:    map.get($color-config, 'warn');
-$is-dark-theme:   map.get($color-config, 'is-dark');
+@import 'theme.scss';
+@import 'typography.scss';
 
 html,
 body {

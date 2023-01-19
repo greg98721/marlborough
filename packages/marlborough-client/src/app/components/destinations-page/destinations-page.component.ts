@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlightService } from 'src/app/services/flight.service';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Airport, cityName } from '@marlborough/model';
 
 @Component({
@@ -18,7 +18,9 @@ export class DestinationsPageComponent implements OnInit {
   constructor(private _flightService: FlightService) {}
 
   ngOnInit(): void {
-    this.origins = this._flightService.getOrigins();
+    this.origins = this._flightService.getOrigins().pipe(
+      map(o => o.sort((a, b) => cityName(a).localeCompare(cityName(b))))
+    );
   }
 
   destinationName(code: Airport): string {

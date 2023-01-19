@@ -139,6 +139,10 @@ Create a file `Marlborough.code.workspace`. When you open this project as a work
 }
 ```
 
+- Note the module type is commonjs - which is required by Nest.js, but Angular moans about it as not possible to tree-shake a commonjs module. Add the following to `build/options` in the the angular.json file to stop the moaning.
+```json
+"allowedCommonJsDependencies": [ "@marlborough/model"]
+```
 - Create a package.json file. Note we are setting the main and type definitions to the index.ts in the root. Note the version number - this will be important for the dependencies in the apps.
 
 ```json
