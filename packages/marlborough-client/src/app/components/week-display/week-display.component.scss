@@ -1,0 +1,16 @@
+@use "@angular/material" as mat;
+@import '../../../theme.scss';
+
+.day-list {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: max-content;
+}
+
+.show-day {
+  color: mat.get-color-from-palette($primary-palette, A200);
+}
+
+.dont-show-day {
+  color: mat.get-color-from-palette($primary-palette, 900);
+}

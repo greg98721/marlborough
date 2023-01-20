@@ -1,1 +1,18 @@
-<p>timetable-page works!</p>
+<div class="mat-headline-4 adjust-width page-header">Flights from {{origin}}</div>
+<div class="timetable-list">
+  <div class="header">Flight Number</div>
+  <div class="header">Departs</div>
+  <div class="header">Arrives</div>
+  <div class="header">Aircraft Type</div>
+  <div class="header">Days</div>
+  <ng-container *ngFor="let dest of timetables">
+    <div class="destination" (click)="gotoDestinationTimetable(dest.destCode)">{{ dest.destination}}</div>
+    <ng-container *ngFor="let timetable of dest.timetables">
+      <div>{{ timetable.flightNumber }}</div>
+      <div>{{ formatTime(timetable.departs) }}</div>
+      <div>{{ formatTime(timetable.arrives) }}</div>
+      <div>{{ timetable.aircraft }}</div>
+      <app-week-display [days]="timetable.days"></app-week-display>
+    </ng-container>
+  </ng-container>
+</div>

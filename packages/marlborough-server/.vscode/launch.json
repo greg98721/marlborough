@@ -12,7 +12,7 @@
       "autoAttachChildProcesses": true
     },
     {
-      "name": "Debug Jest Tests",
+      "name": "nest test",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [

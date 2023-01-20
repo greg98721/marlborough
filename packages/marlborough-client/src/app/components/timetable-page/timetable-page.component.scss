@@ -1,0 +1,33 @@
+@use "@angular/material" as mat;
+@import '../../../theme.scss';
+
+.page-header {
+  color: mat.get-color-from-palette($primary-palette, A200);
+  margin: 3rem;
+}
+
+.header {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.timetable-list {
+  display: grid;
+  grid-template-columns: 0.18fr 0.18fr 0.18fr 0.18fr 0.28fr;
+  margin: 3rem;
+}
+
+.destination {
+  grid-column: span 5;
+  color: black;
+  background-color: mat.get-color-from-palette($primary-palette, 300);
+  padding: 0.2rem;
+  margin-top: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.destination:hover {
+  color: mat.get-color-from-palette($accent-palette, 300);
+}

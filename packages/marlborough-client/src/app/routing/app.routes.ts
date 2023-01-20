@@ -8,6 +8,6 @@ import { TimetableResolver } from './timetable.resolver';
 export const ROUTES: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'destinations', component: DestinationsPageComponent },
-  { path: 'timetable/:airport', component: TimetablePageComponent, resolve: { origin: TimetableResolver } },
+  { path: 'timetable/:airport', component: TimetablePageComponent, resolve: { airport: TimetableResolver } },
   { path: 'flights', component: FlightsPageComponent },
 ];

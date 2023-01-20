@@ -7,6 +7,6 @@ export class FlightsController {
 
   @Get()
   getFlights(@Query('origin') origin: string, @Query('dest') dest: string) {
-    return this.scheduleService.getFlights(origin, dest);
+    return this.scheduleService.flights(origin, dest);
   }
 }

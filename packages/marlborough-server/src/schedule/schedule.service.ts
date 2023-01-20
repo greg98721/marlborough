@@ -17,11 +17,11 @@ export class ScheduleService {
     this._schedule = createSchedule();
   }
 
-  getOrigins() {
+  origins() {
     return getOrigins(this._schedule);
   }
 
-  getRoutes(origin: string) {
+  routes(origin: string) {
     if (isAirport(origin)) {
       const o = origin as Airport;
       return getRoutes(this._schedule, o);
@@ -32,7 +32,7 @@ export class ScheduleService {
     }
   }
 
-  getTimetable(origin: string) {
+  timetable(origin: string) {
     if (isAirport(origin)) {
       const o = origin as Airport;
       return getTimetable(this._schedule, o);
@@ -43,7 +43,7 @@ export class ScheduleService {
     }
   }
 
-  getFlights(origin: string, destination: string) {
+  flights(origin: string, destination: string) {
     if (isAirport(origin) && isAirport(destination)) {
       const o = origin as Airport;
       const d = destination as Airport;

@@ -7,5 +7,3 @@ export interface Flight {
   departed: Date | undefined;
   arrived: Date | undefined;
 }
-
-export const calendarStart = new Date(2022, 1, 1);

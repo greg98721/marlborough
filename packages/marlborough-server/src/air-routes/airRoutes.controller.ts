@@ -8,18 +8,18 @@ export class AirRoutesController {
   @Get()
   @Header('Cache-Control', 'max-age=3600')
   getOrigins() {
-    return this.scheduleService.getOrigins();
+    return this.scheduleService.origins();
   }
 
   @Get(':origin')
   @Header('Cache-Control', 'max-age=3600')
   getRoutes(@Param('origin') origin: string) {
-    return this.scheduleService.getRoutes(origin);
+    return this.scheduleService.routes(origin);
   }
 
   @Get('timetable/:origin')
   @Header('Cache-Control', 'max-age=3600')
   getTimetable(@Param('origin') origin: string) {
-    return this.scheduleService.getTimetable(origin);
+    return this.scheduleService.timetable(origin);
   }
 }
