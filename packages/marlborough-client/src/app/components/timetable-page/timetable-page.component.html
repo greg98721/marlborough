@@ -1,11 +1,11 @@
-<div class="mat-headline-4 adjust-width page-header">Flights from {{origin}}</div>
+<div class="mat-headline-4 adjust-width page-header">Flights from {{origin | async}}</div>
 <div class="timetable-list">
   <div class="header">Flight Number</div>
   <div class="header">Departs</div>
   <div class="header">Arrives</div>
   <div class="header">Aircraft Type</div>
   <div class="header">Days</div>
-  <ng-container *ngFor="let dest of timetables">
+  <ng-container *ngFor="let dest of timetables | async">
     <div class="destination" (click)="gotoDestinationTimetable(dest.destCode)">{{ dest.destination}}</div>
     <ng-container *ngFor="let timetable of dest.timetables">
       <div>{{ timetable.flightNumber }}</div>
