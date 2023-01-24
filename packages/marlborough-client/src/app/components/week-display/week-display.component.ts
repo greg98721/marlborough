@@ -12,6 +12,7 @@ import { FRIDAY, MONDAY, SATURDAY, SUNDAY, THURSDAY, TUESDAY, WEDNESDAY } from '
 
 export class WeekDisplayComponent {
   @Input() days: number = 0;
+  @Input() narrow = false;
   get sunday(): boolean {
     return (this.days & SUNDAY) !== 0;
   }
@@ -32,5 +33,13 @@ export class WeekDisplayComponent {
   }
   get saturday(): boolean {
     return (this.days & SATURDAY) !== 0;
+  }
+
+  dayText(d: string) {
+    if (this.narrow) {
+      return d[0];
+    } else {
+      return d;
+    }
   }
 }

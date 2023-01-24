@@ -1,10 +1,11 @@
 @use "@angular/material" as mat;
-@import 'theme.scss';
-@import 'typography.scss';
+@import "theme.scss";
+@import "typography.scss";
 
 html,
 body {
   height: 100%;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -12,7 +13,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a, a:visited {
+a,
+a:visited {
   color: mat.get-color-from-palette($accent-palette, 500);
   text-decoration: none;
 }
@@ -23,31 +25,21 @@ a:hover {
 }
 
 .adjust-width {
-  font-stretch: 125%,
+  font-stretch: 100%;
+}
+
+@media (max-width: $narrow-breakpoint) {
+  .adjust-width {
+    font-stretch: 85%;
+  }
+}
+
+@media (min-width: $wide-breakpoint) {
+  .adjust-width {
+    font-stretch: 125%;
+  }
 }
 
 .adjust-image {
   filter: brightness(70%) contrast(125%);
-}
-
-.vertical-centre {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
-}
-
-.basic-flex-item {
-  flex: 0 0 auto;
-}
-
-.optional-wrap {
-  flex: 0 1 auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: stretch;
 }

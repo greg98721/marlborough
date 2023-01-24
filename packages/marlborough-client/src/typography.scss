@@ -10,9 +10,6 @@
 
 $my-typography: mat.define-typography-config(
   $font-family: "Mona Sans",
-  $headline-1: mat.define-typography-level(10vw, 12vw, 200, $letter-spacing: 0.05rem),
-  $headline-4: mat.define-typography-level(4vw, 5vw, 300),
-  $headline-6: mat.define-typography-level(2vw, 3vw, 400),
 );
 
 @include mat.all-component-typographies($my-typography);

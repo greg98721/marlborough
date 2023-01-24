@@ -39,3 +39,10 @@ $primary-palette: map.get($color-config, 'primary');
 $accent-palette:  map.get($color-config, 'accent');
 $warn-palette:    map.get($color-config, 'warn');
 $is-dark-theme:   map.get($color-config, 'is-dark');
+
+$narrow-breakpoint: 50rem;
+$wide-breakpoint: 100rem;
+
+$half-wide: calc($wide-breakpoint / 2);
+$third-wide: calc($wide-breakpoint / 2);
+$quarter-wide: calc($wide-breakpoint / 4);

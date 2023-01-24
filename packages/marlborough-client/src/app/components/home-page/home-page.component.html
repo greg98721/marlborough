@@ -1,9 +1,7 @@
-<div class="vertical-centre full-height">
-  <div class="mat-headline-1 basic-flex-item adjust-width main-margin">Marlborough Air</div>
-  <div class="optional-wrap main-margin">
-    <a [routerLink]="['/destinations']" class="mat-headline-4 basic-flex-item adjust-width button-gap">Where We Fly</a>
-    <div class="mat-headline-4 basic-flex-item adjust-width">Book A Flight</div>
-  </div>
+<div class="layout">
+  <div class="headline">Marlborough Air</div>
+  <a [routerLink]="['/destinations']" class="timetable-link">Where We Fly</a>
+  <div class="booking-link">Book A Flight</div>
 </div>
 <!-- We want to preload the images for the destinations page to make it appear instantly -->
 <img *ngFor="let origin of origins | async"
