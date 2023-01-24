@@ -15,11 +15,11 @@
     <div><!--Empty space for margins --></div>
     <ng-container *ngFor="let timetable of dest.timetables">
       <div><!--Empty space for margins --></div>
-      <div>{{ timetable.flightNumber }}</div>
-      <div>{{ formatTime(timetable.departs) }}</div>
-      <div>{{ formatTime(timetable.arrives) }}</div>
-      <div>{{ timetable.aircraft }}</div>
-      <app-week-display [days]="timetable.days" [narrow]=true></app-week-display>
+      <div class="table-content">{{ timetable.flightNumber }}</div>
+      <div class="table-content">{{ formatTime(timetable.departs) }}</div>
+      <div class="table-content">{{ formatTime(timetable.arrives) }}</div>
+      <div class="table-content">{{ timetable.aircraft }}</div>
+      <app-week-display [days]="timetable.days"></app-week-display>
       <div><!--Empty space for margins --></div>
     </ng-container>
   </ng-container>

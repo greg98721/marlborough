@@ -14,3 +14,18 @@
 .dont-show-day {
   color: mat.get-color-from-palette($primary-palette, 500);
 }
+
+.narrow {
+  display: none;
+  font-size: 0.8rem;
+  @media (max-width: $narrow-breakpoint) {
+    display: block;
+  }
+}
+
+.otherwise {
+  display: block;
+  @media (max-width: $narrow-breakpoint) {
+    display: none;
+  }
+}
