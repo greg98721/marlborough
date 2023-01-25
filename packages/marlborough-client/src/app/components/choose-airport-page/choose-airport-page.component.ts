@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 
 import { FlightService } from 'src/app/services/flight.service';
 import { Airport, cityName } from '@marlborough/model';
+import { LoadingService } from 'src/app/services/loading.service';
 
 @Component({
   selector: 'app-choose-airport-page',
@@ -21,7 +22,7 @@ export class ChooseAirportPageComponent implements OnInit {
     originList: { code: Airport; cityName: string }[];
     destinationList: { code: Airport; cityName: string }[];
   }>;
-  constructor(private _flightService: FlightService, private _route: ActivatedRoute, private _router: Router) { }
+  constructor(private _flightService: FlightService, private _route: ActivatedRoute, private _router: Router, private _loadingService: LoadingService) { }
 
   ngOnInit(): void {
     const [hasOrigin, noOrigin] = partition(this._route.queryParamMap, p => p.has('from'));
@@ -39,11 +40,12 @@ export class ChooseAirportPageComponent implements OnInit {
       switchMap(p => {
         const origin = p.get('from');
         if (origin) {
-          return this._flightService.getTimetable(origin);
+          // This could be a new call to the API server so put up the twirly whirly in case it takes some time
+          return this._loadingService.setLoadingWhile(this._flightService.getTimetable(origin));
         } else {
           throw Error('Should never get here as we have checked we had an origin parameter')
         }
-      }), // this will have been called before so will be cached
+      }),
       map(timetables => {
         if (timetables.length > 0) {
           // get the unique destinations
@@ -62,13 +64,4 @@ export class ChooseAirportPageComponent implements OnInit {
 
     this.displayData$ = merge(withOriginList$, withDestinationList$);
   }
-
-  selectOrigin(origin: Airport) {
-
-  }
-
-  selectDestination(origin: Airport, destination: Airport) {
-
-  }
-
 }

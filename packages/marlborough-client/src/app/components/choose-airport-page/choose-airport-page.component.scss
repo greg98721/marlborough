@@ -1,0 +1,96 @@
+@use "@angular/material" as mat;
+@import "../../../theme.scss";
+
+.origin-layout {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 0.5fr 20rem 30rem 0.5fr;
+  grid-template-rows: 0.5fr max-content 0.5fr;
+  grid-template-areas:
+    ". . . ."
+    ". origin-question-block origin-list-block ."
+    ". . . .";
+
+  @media (max-width: $narrow-breakpoint) {
+    margin: 1rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content max-content;
+    grid-template-areas:
+      "origin-question-block"
+      "origin-list-block";
+  }
+}
+
+.destination-layout {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 0.5fr 20rem 30rem 0.5fr;
+  grid-template-rows: 0.5fr max-content max-content 0.5fr;
+  grid-template-areas:
+    ". . . ."
+    ". origin-summary-block origin-summary-block ."
+    ". destination-question-block destination-list-block ."
+    ". . . .";
+
+  @media (max-width: $narrow-breakpoint) {
+    margin: 1rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content max-content max-content;
+    grid-template-areas:
+      "origin-summary-block"
+      "destination-question-block"
+      "destination-list-block";
+  }
+}
+
+
+.origin-question {
+  grid-area: origin-question-block;
+}
+
+.destination-question {
+  grid-area: destination-question-block;
+}
+
+.origin-question,.destination-question  {
+  font-size: 2.5rem;
+  line-height: 3rem;
+  @media (max-width: $narrow-breakpoint) {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+}
+
+.origin-list {
+  grid-area: origin-list-block;
+}
+
+.destination-list {
+  grid-area: destination-list-block;
+}
+
+.origin-list, .destination-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  a {
+    font-size: 2.5rem;
+    line-height: 3rem;
+    @media (max-width: $narrow-breakpoint) {
+      font-size: 2rem;
+      line-height: 2.5rem;
+    }
+  }
+}
+
+.origin-summary {
+  grid-area: origin-summary-block;
+  font-size: 2.5rem;
+  line-height: 3rem;
+  margin-bottom: 1.5rem;
+  color: mat.get-color-from-palette($primary-palette, 300);
+  @media (max-width: $narrow-breakpoint) {
+    font-size: 2rem;
+    line-height: 2.5rem;
+    margin-bottom: 1rem;
+  }
+}

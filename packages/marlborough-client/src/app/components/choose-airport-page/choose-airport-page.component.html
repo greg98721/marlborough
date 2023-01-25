@@ -1,14 +1,17 @@
 <ng-container *ngIf="displayData$ | async as displayData">
-  <div *ngIf="displayData.originCode === undefined">
-    <div>Select the origin of the flight</div>
-    <div>
-      <a *ngFor="let origin of displayData.originList" [routerLink]="['/choose']" [queryParams]="{from: origin.code}" class="book-now">{{ origin.cityName }}</a>
+  <div *ngIf="displayData.originCode === undefined" class="origin-layout">
+    <div class="origin-question">Taking off from:</div>
+    <div class="origin-list">
+      <a *ngFor="let origin of displayData.originList" [routerLink]="['/choose']" [queryParams]="{from: origin.code}">{{
+        origin.cityName }}</a>
     </div>
   </div>
-  <div *ngIf="displayData.originCode !== undefined">
-    <div>Flying from {{displayData.originName}}</div>
-    <div>
-      <div *ngFor="let destination of displayData.destinationList" (click)="selectDestination(displayData.originCode, destination.code)">{{ destination.cityName }}</div>
+  <div *ngIf="displayData.originCode !== undefined" class="destination-layout">
+    <div class="origin-summary">Taking off from {{displayData.originName}}</div>
+    <div class="destination-question">Flying to:</div>
+    <div class="destination-list">
+      <a *ngFor="let destination of displayData.destinationList" [routerLink]="['/flights']"
+        [queryParams]="{from: displayData.originCode, to: destination.code}">{{ destination.cityName }}</a>
     </div>
   </div>
 </ng-container>

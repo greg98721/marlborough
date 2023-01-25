@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, tap, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap, switchMap, delay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +11,11 @@ export class LoadingService {
 
   constructor() { }
 
-  setLoadingWhile<T>(action: Observable<T>): Observable<T> {
+  setLoadingWhile<T>(action$: Observable<T>): Observable<T> {
     return of(null).pipe(
+      delay(0), // this gives Angular a chance to get itself in order and avoids the "Expression has changed after it was checked" error
       tap(() => this.startLoading()),
-      switchMap(() => action),
+      switchMap(() => action$),
       tap({
         next: () => this.endLoading(),
         error: () => this.endLoading()
