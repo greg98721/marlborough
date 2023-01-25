@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+
 import { addMinutes, format } from 'date-fns/fp';
 import { Observable, map } from 'rxjs';
 import { Airport, cityName, isAirport, TimetableFlight } from '@marlborough/model';
@@ -9,18 +10,18 @@ import { WeekDisplayComponent } from '../week-display/week-display.component';
 @Component({
   selector: 'app-timetable-page',
   standalone: true,
-  imports: [CommonModule, WeekDisplayComponent],
+  imports: [CommonModule, WeekDisplayComponent, RouterModule],
   templateUrl: './timetable-page.component.html',
   styleUrls: ['./timetable-page.component.scss']
 })
 export class TimetablePageComponent implements OnInit {
-  constructor(private route: ActivatedRoute, private router: Router) { }
+  constructor(private _route: ActivatedRoute, private _router: Router) { }
 
-  origin?: Observable<string>;
-  timetables?: Observable<{ destination: string; destCode: string; timetables: TimetableFlight[] }[]>;
+  origin$?: Observable<string>;
+  timetables$?: Observable<{ destination: string; destCode: string; timetables: TimetableFlight[] }[]>;
 
   ngOnInit(): void {
-    this.origin = this.route.paramMap.pipe(
+    this.origin$ = this._route.paramMap.pipe(
       map(o => {
         const airport = o.get('airport');
         if (airport && isAirport(airport)) {
@@ -30,7 +31,7 @@ export class TimetablePageComponent implements OnInit {
         }
       })
     );
-    this.timetables = this.route.data.pipe(
+    this.timetables$ = this._route.data.pipe(
       map(t => {
         const timetables = t['airport'] as TimetableFlight[];
 
@@ -50,9 +51,5 @@ export class TimetablePageComponent implements OnInit {
   formatTime(minutes: number): string {
     // we need a date, even though it will disappear when we format it again
     return format('p', addMinutes(minutes, new Date(2023, 1, 1, 0, 0, 0)));
-  }
-
-  gotoDestinationTimetable(dest: string) {
-    this.router.navigate([`/timetable/${dest}`]);
   }
 }

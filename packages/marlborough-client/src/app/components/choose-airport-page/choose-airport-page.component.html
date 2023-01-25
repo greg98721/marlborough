@@ -1,0 +1,14 @@
+<ng-container *ngIf="displayData$ | async as displayData">
+  <div *ngIf="displayData.originCode === undefined">
+    <div>Select the origin of the flight</div>
+    <div>
+      <a *ngFor="let origin of displayData.originList" [routerLink]="['/choose']" [queryParams]="{from: origin.code}" class="book-now">{{ origin.cityName }}</a>
+    </div>
+  </div>
+  <div *ngIf="displayData.originCode !== undefined">
+    <div>Flying from {{displayData.originName}}</div>
+    <div>
+      <div *ngFor="let destination of displayData.destinationList" (click)="selectDestination(displayData.originCode, destination.code)">{{ destination.cityName }}</div>
+    </div>
+  </div>
+</ng-container>

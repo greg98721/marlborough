@@ -5,8 +5,8 @@ import { alea, PRNG } from 'seedrandom';
  */
 export class PsuedoRandom {
   readonly prng: PRNG;
-  constructor(seed: string) {
-    this.prng = alea(seed);
+  constructor(_seed: string) {
+    this.prng = alea(_seed);
   }
 
   withinPrecent(pc: number): boolean {

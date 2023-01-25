@@ -248,3 +248,9 @@ bootstrapApplication(AppComponent, {
 })
   .catch(err => console.error(err));
   ```
+
+## Naming Convention
+
+Use the common practice to match what would be expected in Angular code
+* '_' prefix for private variables and members
+* '$' suffix for observable variables

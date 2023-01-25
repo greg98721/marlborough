@@ -7,7 +7,7 @@ import { LoadingService } from "../services/loading.service";
 
 @Injectable({ providedIn: 'root' })
 export class TimetableResolver implements Resolve<TimetableFlight[]> {
-  constructor(private flightService: FlightService, private loadingService: LoadingService) { }
+  constructor(private _flightService: FlightService, private _loadingService: LoadingService) { }
 
   resolve(
     route: ActivatedRouteSnapshot,
@@ -15,7 +15,7 @@ export class TimetableResolver implements Resolve<TimetableFlight[]> {
   ): Observable<TimetableFlight[]> {
     const airport = route.paramMap.get('airport');
     if (airport) {
-      return this.loadingService.setLoadingWhile(this.flightService.getTimetable(airport));
+      return this._loadingService.setLoadingWhile(this._flightService.getTimetable(airport));
     } else {
       throw new Error('No origin when navigating to timetables');
     }

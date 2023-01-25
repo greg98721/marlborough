@@ -13,7 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
 })
 
 export class LoadingOverlayComponent implements OnDestroy {
-  destroyed = new Subject<void>();
+  destroyed$ = new Subject<void>();
   spinnerDiameter = 40;
   spinnerStroke = 4;
 
@@ -26,8 +26,8 @@ export class LoadingOverlayComponent implements OnDestroy {
     [Breakpoints.XLarge, 400],
   ]);
 
-  constructor(breakpointObserver: BreakpointObserver) {
-    breakpointObserver
+  constructor(_breakpointObserver: BreakpointObserver) {
+    _breakpointObserver
       .observe([
         Breakpoints.XSmall,
         Breakpoints.Small,
@@ -35,7 +35,7 @@ export class LoadingOverlayComponent implements OnDestroy {
         Breakpoints.Large,
         Breakpoints.XLarge,
       ])
-      .pipe(takeUntil(this.destroyed))
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(result => {
         for (const query of Object.keys(result.breakpoints)) {
           if (result.breakpoints[query]) {
@@ -48,8 +48,8 @@ export class LoadingOverlayComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
 }

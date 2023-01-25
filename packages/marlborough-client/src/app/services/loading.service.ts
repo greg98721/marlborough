@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable, of, tap, switchMap } from 'rxjs';
 })
 export class LoadingService {
 
-  private _isLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _count = 0;
 
   constructor() { }
@@ -23,17 +23,17 @@ export class LoadingService {
   }
 
   get isLoading(): Observable<boolean> {
-    return this._isLoading;
+    return this._isLoading$;
   }
 
   private startLoading() {
-    this._isLoading.next(true);
+    this._isLoading$.next(true);
     this._count++;
   }
 
   private endLoading() {
     if (--this._count <= 0) {
-      this._isLoading.next(false);
+      this._isLoading$.next(false);
     }
   }
 }
