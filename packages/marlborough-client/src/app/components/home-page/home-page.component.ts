@@ -22,6 +22,6 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {
     // when we start grab the images for the destinations page early to let appear instant
     // no need for the loading service as this is intended to be in the background
-    this.origins$ = this._flightService.getOrigins();
+    this.origins$ = this._flightService.getOrigins$();
   }
 }

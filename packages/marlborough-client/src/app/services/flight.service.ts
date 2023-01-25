@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Airport, isAirport, TimetableFlight } from '@marlborough/model';
+import { Airport, Flight, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
 import { AppConfigService } from './app-config.service';
 
@@ -12,7 +12,7 @@ export class FlightService {
 
   constructor(private _http: HttpClient, private _config: AppConfigService) { }
 
-  getOrigins(): Observable<Airport[]> {
+  getOrigins$(): Observable<Airport[]> {
     const url = this._config.apiUrl('routes');
     return this._http.get(url).pipe(
       map(response => {
@@ -28,7 +28,7 @@ export class FlightService {
     )
   }
 
-  getTimetable(origin: string): Observable<TimetableFlight[]> {
+  getTimetable$(origin: string): Observable<TimetableFlight[]> {
     const url = this._config.apiUrl(`routes/timetable/${origin}`);
     return this._http.get(url).pipe(
       map(response => {
@@ -36,6 +36,22 @@ export class FlightService {
         if (rawList.every(t => isAirport(t.route.destination) && isAirport(t.route.origin))) {
           // this is mainly to catch the server and client being out of synch in list of airports
           return rawList as TimetableFlight[];
+        } else {
+          throw new TypeError(`Invalid airport in getting list of timetables for ${origin} from server`);
+        }
+      }),
+      catchError(_ => []) // we have proper http error handling higher up the stack - for here keep things polite
+    )
+  }
+
+  getFlights$(origin: string, destination: string): Observable<{ timetableFlight: TimetableFlight; flights: Flight[] }[]> {
+    const url = this._config.apiUrl(`flights?origin=${origin}&dest=${destination}`);
+    return this._http.get(url).pipe(
+      map(response => {
+        const rawList = response as any[];
+        if (rawList.every(t => isAirport(t.timetableFlight.route.destination) && isAirport(t.timetableFlight.route.origin))) {
+          // this is mainly to catch the server and client being out of synch in list of airports
+          return rawList as { timetableFlight: TimetableFlight; flights: Flight[] }[];
         } else {
           throw new TypeError(`Invalid airport in getting list of timetables for ${origin} from server`);
         }

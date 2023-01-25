@@ -14,9 +14,9 @@ import { LoadingService } from './services/loading.service';
 })
 export class AppComponent {
   title = 'Marlborough';
-  isLoading: Observable<boolean>;
+  isLoading$: Observable<boolean>;
 
   constructor(private _loadingService: LoadingService) {
-    this.isLoading = this._loadingService.isLoading;
+    this.isLoading$ = this._loadingService.isLoading$;
   }
 }

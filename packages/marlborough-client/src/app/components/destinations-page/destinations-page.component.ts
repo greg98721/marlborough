@@ -19,7 +19,7 @@ export class DestinationsPageComponent implements OnInit {
   constructor(private _flightService: FlightService) {}
 
   ngOnInit(): void {
-    this.origins$ = this._flightService.getOrigins().pipe(
+    this.origins$ = this._flightService.getOrigins$().pipe(
       map(o => o.sort((a, b) => cityName(a).localeCompare(cityName(b))))
     );
   }

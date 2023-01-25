@@ -28,7 +28,7 @@ export class ChooseAirportPageComponent implements OnInit {
     const [hasOrigin, noOrigin] = partition(this._route.queryParamMap, p => p.has('from'));
 
     const withOriginList$ = noOrigin.pipe(
-      switchMap(p => this._flightService.getOrigins()), // this will have been called before so will be cached
+      switchMap(p => this._flightService.getOrigins$()), // this will have been called before so will be cached
       map(ol => {
         const withNames = ol.map(o => ({ code: o, cityName: cityName(o) }));
         const sorted = withNames.sort((a, b) => a.cityName.localeCompare(b.cityName));
@@ -41,7 +41,7 @@ export class ChooseAirportPageComponent implements OnInit {
         const origin = p.get('from');
         if (origin) {
           // This could be a new call to the API server so put up the twirly whirly in case it takes some time
-          return this._loadingService.setLoadingWhile(this._flightService.getTimetable(origin));
+          return this._loadingService.setLoadingWhile(this._flightService.getTimetable$(origin));
         } else {
           throw Error('Should never get here as we have checked we had an origin parameter')
         }

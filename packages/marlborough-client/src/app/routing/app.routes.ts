@@ -5,11 +5,12 @@ import { HomePageComponent } from '../components/home-page/home-page.component';
 import { TimetablePageComponent } from '../components/timetable-page/timetable-page.component';
 import { ChooseAirportPageComponent } from '../components/choose-airport-page/choose-airport-page.component';
 import { TimetableResolver } from './timetable.resolver';
+import { FlightsResolver } from './flights.resolver';
 
 export const ROUTES: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'destinations', component: DestinationsPageComponent },
   { path: 'timetable/:airport', component: TimetablePageComponent, resolve: { airport: TimetableResolver } },
-  { path: 'flights', component: FlightsPageComponent },
+  { path: 'flights', component: FlightsPageComponent, resolve: { airport: FlightsResolver } },
   { path: 'choose', component: ChooseAirportPageComponent },
 ];

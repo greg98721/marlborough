@@ -11,7 +11,7 @@
     <div class="destination-question">Flying to:</div>
     <div class="destination-list">
       <a *ngFor="let destination of displayData.destinationList" [routerLink]="['/flights']"
-        [queryParams]="{from: displayData.originCode, to: destination.code}">{{ destination.cityName }}</a>
+        [queryParams]="{origin: displayData.originCode, destination: destination.code}">{{ destination.cityName }}</a>
     </div>
   </div>
 </ng-container>

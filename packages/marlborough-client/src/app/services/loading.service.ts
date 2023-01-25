@@ -23,7 +23,7 @@ export class LoadingService {
     )
   }
 
-  get isLoading(): Observable<boolean> {
+  get isLoading$(): Observable<boolean> {
     return this._isLoading$;
   }
 

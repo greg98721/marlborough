@@ -1,4 +1,9 @@
-import { Airport, isAirport } from '@marlborough/model';
+import {
+  Airport,
+  Flight,
+  isAirport,
+  TimetableFlight,
+} from '@marlborough/model';
 import { Injectable } from '@nestjs/common';
 import {
   createSchedule,
@@ -43,7 +48,10 @@ export class ScheduleService {
     }
   }
 
-  flights(origin: string, destination: string) {
+  flights(
+    origin: string,
+    destination: string,
+  ): { timetableFlight: TimetableFlight; flights: Flight[] }[] {
     if (isAirport(origin) && isAirport(destination)) {
       const o = origin as Airport;
       const d = destination as Airport;
