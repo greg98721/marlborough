@@ -24,11 +24,11 @@ export class DestinationsPageComponent implements OnInit {
     );
   }
 
-  destinationName(code: Airport): string {
+  originName(code: Airport): string {
     return cityName(code);
   }
 
-  destinationFluff(code: Airport): string {
+  originFluff(code: Airport): string {
     switch (code) {
       case 'NZAA': return DUMMY_TEXT[0];
       case 'NZCH': return DUMMY_TEXT[1];

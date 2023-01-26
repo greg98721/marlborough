@@ -17,7 +17,8 @@ export class FlightsResolver implements Resolve<{ timetableFlight: TimetableFlig
     const origin = route.paramMap.get('origin');
     const destination = route.paramMap.get('destination');
     if (origin && destination) {
-      return this._loadingService.setLoadingWhile(this._flightService.getFlights$(origin, destination));
+      // this API call is not cached so will need the twirly whirly
+      return this._loadingService.setLoadingWhile$(this._flightService.getFlights$(origin, destination));
     } else {
       throw new Error('No origin and/or destination when navigating to flights');
     }

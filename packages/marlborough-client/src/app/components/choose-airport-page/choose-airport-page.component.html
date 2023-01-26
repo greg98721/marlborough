@@ -1,17 +1,24 @@
 <ng-container *ngIf="displayData$ | async as displayData">
-  <div *ngIf="displayData.originCode === undefined" class="origin-layout">
-    <div class="origin-question">Taking off from:</div>
+  <div *ngIf="displayData.origin === undefined" class="origin-layout">
+    <div class="origin-question">Taking off from?</div>
     <div class="origin-list">
-      <a *ngFor="let origin of displayData.originList" [routerLink]="['/choose']" [queryParams]="{from: origin.code}">{{
+      <a *ngFor="let origin of displayData.originList" [routerLink]="['/choose']"
+        [queryParams]="{origin: origin.code}">{{
         origin.cityName }}</a>
     </div>
   </div>
-  <div *ngIf="displayData.originCode !== undefined" class="destination-layout">
-    <div class="origin-summary">Taking off from {{displayData.originName}}</div>
-    <div class="destination-question">Flying to:</div>
+  <div *ngIf="displayData.origin !== undefined && displayData.destination === undefined" class="destination-layout">
+    <div class="origin-summary">Taking off from {{displayData.origin.cityName}}</div>
+    <div class="destination-question">Flying to?</div>
     <div class="destination-list">
-      <a *ngFor="let destination of displayData.destinationList" [routerLink]="['/flights']"
-        [queryParams]="{origin: displayData.originCode, destination: destination.code}">{{ destination.cityName }}</a>
+      <a *ngFor="let destination of displayData.destinationList" [routerLink]="['/choose']"
+        [queryParams]="{origin: displayData.origin.code, destination: destination.code}">{{ destination.cityName }}</a>
     </div>
+  </div>
+  <div *ngIf="displayData.origin !== undefined && displayData.destination !== undefined" class="date-layout">
+    <div class="origin-summary">Taking off from {{displayData.origin.cityName}}</div>
+    <div class="destination-summary">Flying to {{displayData.destination.cityName}}</div>
+    <div class="date-question">Date of flight?</div>
+    <mat-calendar [minDate]="earliestDate" [maxDate]="latestDate" (selectedChange)="dateSelected($event)" color="accent" class="date-picker"></mat-calendar>
   </div>
 </ng-container>

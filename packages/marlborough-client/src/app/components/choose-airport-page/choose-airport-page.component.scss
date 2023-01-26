@@ -14,10 +14,12 @@
   @media (max-width: $narrow-breakpoint) {
     margin: 1rem;
     grid-template-columns: 1fr;
-    grid-template-rows: max-content max-content;
+    grid-template-rows: 0.5fr max-content max-content 0.5fr;
     grid-template-areas:
+      "."
       "origin-question-block"
-      "origin-list-block";
+      "origin-list-block"
+      ".";
   }
 }
 
@@ -28,21 +30,48 @@
   grid-template-rows: 0.5fr max-content max-content 0.5fr;
   grid-template-areas:
     ". . . ."
-    ". origin-summary-block origin-summary-block ."
+    ". . origin-summary-block ."
     ". destination-question-block destination-list-block ."
     ". . . .";
 
   @media (max-width: $narrow-breakpoint) {
     margin: 1rem;
     grid-template-columns: 1fr;
-    grid-template-rows: max-content max-content max-content;
+    grid-template-rows: 0.5fr max-content max-content max-content 0.5fr;
     grid-template-areas:
+      "."
       "origin-summary-block"
       "destination-question-block"
-      "destination-list-block";
+      "destination-list-block"
+      ".";
   }
 }
 
+.date-layout {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 0.5fr 20rem 30rem 0.5fr;
+  grid-template-rows: 0.5fr max-content max-content max-content 0.5fr;
+  grid-template-areas:
+    ". . . ."
+    ". . origin-summary-block ."
+    ". . destination-summary-block ."
+    ". date-question-block date-picker-block ."
+    ". . . .";
+
+  @media (max-width: $narrow-breakpoint) {
+    margin: 1rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.5fr max-content max-content max-content max-content 0.5fr;
+    grid-template-areas:
+      "."
+      "origin-summary-block"
+      "destination-summary-block"
+      "date-question-block"
+      "date-picker-block"
+      ".";
+  }
+}
 
 .origin-question {
   grid-area: origin-question-block;
@@ -52,7 +81,13 @@
   grid-area: destination-question-block;
 }
 
-.origin-question,.destination-question  {
+.date-question {
+  grid-area: date-question-block;
+}
+
+.origin-question,
+.destination-question,
+.date-question {
   font-size: 2.5rem;
   line-height: 3rem;
   @media (max-width: $narrow-breakpoint) {
@@ -69,7 +104,14 @@
   grid-area: destination-list-block;
 }
 
-.origin-list, .destination-list {
+.date-picker {
+  grid-area: date-picker-block;
+  border: 1px solid rgba(mat.get-color-from-palette($accent-palette, 400), 0.5);
+  background-color: rgba(black, 0.15);
+}
+
+.origin-list,
+.destination-list {
   display: grid;
   grid-template-columns: 1fr;
   a {
@@ -84,6 +126,14 @@
 
 .origin-summary {
   grid-area: origin-summary-block;
+}
+
+.destination-summary {
+  grid-area: destination-summary-block;
+}
+
+.origin-summary,
+.destination-summary {
   font-size: 2.5rem;
   line-height: 3rem;
   margin-bottom: 1.5rem;
