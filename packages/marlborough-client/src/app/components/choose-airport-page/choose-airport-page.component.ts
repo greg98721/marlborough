@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { Observable, map, partition, switchMap, merge } from 'rxjs';
-import { RouterModule } from '@angular/router';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
-import { addDays } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { addDays, formatISOWithOptions } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { FlightService } from 'src/app/services/flight.service';
 import { Airport, cityName, isAirport } from '@marlborough/model';
@@ -31,7 +30,7 @@ export class ChooseAirportPageComponent implements OnInit {
   earliestDate: Date;
   latestDate: Date;
 
-  constructor(private _flightService: FlightService, private _route: ActivatedRoute, private _loadingService: LoadingService) {
+  constructor(private _flightService: FlightService, private _route: ActivatedRoute, private _router: Router, private _loadingService: LoadingService) {
     this.earliestDate = addDays(1, new Date());
     this.latestDate = addDays(42, this.earliestDate);
   }
@@ -94,7 +93,8 @@ export class ChooseAirportPageComponent implements OnInit {
     this.displayData$ = merge(withOriginList$, withDestinationList$, forDateSelection$);
   }
 
-  dateSelected(d: Date) {
-    let a = d;
+  dateSelected(origin: Airport, destination: Airport, date: Date) {
+    const datestring = formatISOWithOptions({ representation: 'date' }, date);
+    this._router.navigateByUrl(`flights?origin=${origin}&destination=${destination}&date=${datestring}`);
   }
 }

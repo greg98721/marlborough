@@ -14,8 +14,8 @@ export class FlightsResolver implements Resolve<{ timetableFlight: TimetableFlig
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<{ timetableFlight: TimetableFlight; flights: Flight[] }[]> {
-    const origin = route.paramMap.get('origin');
-    const destination = route.paramMap.get('destination');
+    const origin = route.queryParamMap.get('origin');
+    const destination = route.queryParamMap.get('destination');
     if (origin && destination) {
       // this API call is not cached so will need the twirly whirly
       return this._loadingService.setLoadingWhile$(this._flightService.getFlights$(origin, destination));

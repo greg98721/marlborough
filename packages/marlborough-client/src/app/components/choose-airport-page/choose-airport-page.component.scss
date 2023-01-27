@@ -1,4 +1,3 @@
-@use "@angular/material" as mat;
 @use "../../../styles.scss" as *;
 
 .origin-layout {
@@ -106,8 +105,8 @@
 
 .date-picker {
   grid-area: date-picker-block;
-  border: 1px solid rgba(mat.get-color-from-palette($accent-palette, 400), 0.5);
-  background-color: rgba(black, 0.15);
+  border: 1px solid rgba($accent-color, 0.5);
+  background-color: rgba($opposite-text-color, 0.15);
 }
 
 .origin-list,
@@ -137,7 +136,7 @@
   font-size: 2.5rem;
   line-height: 3rem;
   margin-bottom: 1.5rem;
-  color: mat.get-color-from-palette($primary-palette, 300);
+  color: $primary-color;
   @media (max-width: $narrow-breakpoint) {
     font-size: 2rem;
     line-height: 2.5rem;

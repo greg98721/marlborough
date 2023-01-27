@@ -1,4 +1,3 @@
-@use "@angular/material" as mat;
 @use '../../../styles.scss' as *;
 
 .day-list {
@@ -8,11 +7,11 @@
 }
 
 .show-day {
-  color: mat.get-color-from-palette($accent-palette, 300);
+  color: $accent-color;
 }
 
 .dont-show-day {
-  color: mat.get-color-from-palette($primary-palette, 500);
+  color: $dull-primary-color;
 }
 
 .narrow {

@@ -19,6 +19,8 @@
     <div class="origin-summary">Taking off from {{displayData.origin.cityName}}</div>
     <div class="destination-summary">Flying to {{displayData.destination.cityName}}</div>
     <div class="date-question">Date of flight?</div>
-    <mat-calendar [minDate]="earliestDate" [maxDate]="latestDate" (selectedChange)="dateSelected($event)" color="accent" class="date-picker"></mat-calendar>
+    <mat-calendar [minDate]="earliestDate" [maxDate]="latestDate"
+      (selectedChange)="dateSelected(displayData.origin.code, displayData.destination.code, $event)" color="accent"
+      class="date-picker"></mat-calendar>
   </div>
 </ng-container>

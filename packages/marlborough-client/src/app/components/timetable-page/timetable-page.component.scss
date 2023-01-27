@@ -1,5 +1,5 @@
-@use "@angular/material" as mat;
 @use "../../../styles.scss" as *;
+
 $twenty-wide: calc($wide-breakpoint * 0.2);
 
 .timetable-list {
@@ -13,7 +13,7 @@ $twenty-wide: calc($wide-breakpoint * 0.2);
 
 .page-header {
   grid-column: span 5;
-  color: mat.get-color-from-palette($primary-palette, A200);
+  color: $bright-primary-color;
   font-size: 4vw;
   line-height: 7vw;
 
@@ -38,10 +38,10 @@ $twenty-wide: calc($wide-breakpoint * 0.2);
   }
 }
 
-.destination {
+a.destination {
   grid-column: span 5;
-  color: black;
-  background-color: mat.get-color-from-palette($primary-palette, 300);
+  color: $opposite-text-color;
+  background-color: $primary-color;
   padding: 0.2rem;
   margin-top: 1rem;
   font-size: 1.3rem;
@@ -50,7 +50,7 @@ $twenty-wide: calc($wide-breakpoint * 0.2);
 }
 
 .destination:hover {
-  color: mat.get-color-from-palette($accent-palette, 300);
+  color: $accent-color;
 }
 
 .table-content {

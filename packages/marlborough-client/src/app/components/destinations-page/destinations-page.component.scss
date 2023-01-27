@@ -1,4 +1,3 @@
-@use "@angular/material" as mat;
 @use "../../../styles.scss" as *;
 
 .layout {
@@ -53,7 +52,7 @@
   grid-area: cityname_block;
   font-size: 5vw;
   line-height: 6vw;
-  color: mat.get-color-from-palette($primary-palette, A200);
+  color: $bright-primary-color;
 
   @media (max-width: $narrow-breakpoint) {
     font-size: 2.5rem;
