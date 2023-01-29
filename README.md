@@ -255,6 +255,8 @@ Use the common practice to match what would be expected in Angular code
 * '_' prefix for private variables and members
 * '$' suffix for observable variables
 
+Use observable viewmodels to transfer data to the page - standard name `vm$`
+
 ## Don't Need OnInit For Observables
 
 This is based on [this article](https://indepth.dev/posts/1508/structure-initialization-logic-without-ngoninit-utilize-observables-and-ngonchanges).

@@ -14,13 +14,10 @@ import { LoadingService } from 'src/app/services/loading.service';
   styleUrls: ['./choose-destination-page.component.scss']
 })
 export class ChooseDestinationPageComponent {
-
-  vm$ = this.create_vm$();
-
   constructor(private _flightService: FlightService, private _route: ActivatedRoute, private _loadingService: LoadingService) { }
 
-  create_vm$(): Observable<{ origin: { code: Airport; cityName: string }; destinationList: { code: Airport; cityName: string }[] }> {
-    return this._route.paramMap.pipe(
+  vm$: Observable<{ origin: { code: Airport; cityName: string }; destinationList: { code: Airport; cityName: string }[] }> =
+    this._route.paramMap.pipe(
       switchMap(p => {
         const origin = p.get('origin');
         if (origin && isAirport(origin)) {
@@ -44,5 +41,4 @@ export class ChooseDestinationPageComponent {
         }
       })
     );
-  }
 }

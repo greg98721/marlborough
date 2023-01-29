@@ -14,17 +14,13 @@ import { Observable, map } from 'rxjs';
 })
 
 export class ChooseOriginPageComponent {
-
-  vm$ = this.create_vm$();
-
   constructor(private _flightService: FlightService) { }
 
-  create_vm$(): Observable<{ code: Airport; cityName: string }[]> {
-    return this._flightService.getOrigins$().pipe(
+  vm$: Observable<{ code: Airport; cityName: string }[]> =
+    this._flightService.getOrigins$().pipe(
       // this will have been called before so will be cached
       map(ol => {
         const withNames = ol.map(o => ({ code: o, cityName: cityName(o) }));
         return withNames.sort((a, b) => a.cityName.localeCompare(b.cityName));
       }));
-  }
 }

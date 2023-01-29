@@ -17,32 +17,34 @@ import { WeekDisplayComponent } from '../week-display/week-display.component';
 export class TimetablePageComponent {
   constructor(private _route: ActivatedRoute) { }
 
-  origin$ = this._route.paramMap.pipe(
-    map(o => {
-      const origin = o.get('origin');
-      if (origin && isAirport(origin)) {
-        return cityName(origin);
-      } else {
-        return '';
-      }
-    })
-  );
+  origin$: Observable<string> =
+    this._route.paramMap.pipe(
+      map(o => {
+        const origin = o.get('origin');
+        if (origin && isAirport(origin)) {
+          return cityName(origin);
+        } else {
+          return '';
+        }
+      })
+    );
 
-  timetables$ = this._route.data.pipe(
-    map(t => {
-      const data = t['airport'] as { origin: Airport; timetable: TimetableFlight[]};
+  timetables$: Observable<{ destination: string; destCode: Airport, timetables: TimetableFlight[] }[]> =
+    this._route.data.pipe(
+      map(t => {
+        const data = t['origin'] as { origin: Airport; timetable: TimetableFlight[] };
 
-      // get the unique destinations
-      const a = data.timetable.map(t => t.route.destination);
-      const unique = [...new Set(a)];
+        // get the unique destinations
+        const a = data.timetable.map(t => t.route.destination);
+        const unique = [...new Set(a)];
 
-      return unique.map(u => {
-        const name = cityName(u);
-        const s = data.timetable.filter(t => t.route.destination === u).sort((a, b) => a.departs >= b.departs ? 1 : -1);
-        return { destination: name, destCode: u, timetables: s };
-      }).sort((a, b) => a.destination.localeCompare(b.destination));
-    })
-  );
+        return unique.map(u => {
+          const name = cityName(u);
+          const s = data.timetable.filter(t => t.route.destination === u).sort((a, b) => a.departs >= b.departs ? 1 : -1);
+          return { destination: name, destCode: u, timetables: s };
+        }).sort((a, b) => a.destination.localeCompare(b.destination));
+      })
+    );
 
   formatTime(minutes: number): string {
     // we need a date, even though it will disappear when we format it again
