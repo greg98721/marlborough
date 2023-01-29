@@ -1,6 +1,7 @@
 import {
   Airport,
   Flight,
+  FlightBookingSelection,
   isAirport,
   TimetableFlight,
 } from '@marlborough/model';
@@ -51,11 +52,12 @@ export class ScheduleService {
   flights(
     origin: string,
     destination: string,
-  ): { timetableFlight: TimetableFlight; flights: Flight[] }[] {
+    selectedDate: string,
+  ): FlightBookingSelection {
     if (isAirport(origin) && isAirport(destination)) {
       const o = origin as Airport;
       const d = destination as Airport;
-      return getFlights(this._schedule, o, d);
+      return getFlights(this._schedule, o, d, selectedDate);
     } else {
       throw new TypeError(
         `Tried to convert a non valid airport code ${origin} and/or ${destination} when getting list of flights`,

@@ -1,3 +1,5 @@
+import { TimetableFlight } from "./timetableFlight";
+
 export interface Flight {
   flightNumber: string;
   date: Date;
@@ -7,3 +9,13 @@ export interface Flight {
   departed: Date | undefined;
   arrived: Date | undefined;
 }
+
+export interface FlightBookingSelection {
+  requestedDate: Date;
+  flights: {
+     timetableFlight: TimetableFlight;
+     flights: Flight[]
+    }[]
+}
+
+export const maximumBookingDay = 42; // up to 6 weeks out

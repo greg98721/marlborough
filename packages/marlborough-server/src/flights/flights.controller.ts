@@ -6,7 +6,11 @@ export class FlightsController {
   constructor(private readonly _scheduleService: ScheduleService) {}
 
   @Get()
-  getFlights(@Query('origin') origin: string, @Query('dest') dest: string) {
-    return this._scheduleService.flights(origin, dest);
+  getFlights(
+    @Query('origin') origin: string,
+    @Query('dest') dest: string,
+    @Query('date') selectedDate: string,
+  ) {
+    return this._scheduleService.flights(origin, dest, selectedDate);
   }
 }

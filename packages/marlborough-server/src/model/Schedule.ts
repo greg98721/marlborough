@@ -1,4 +1,10 @@
-import { addMilliseconds, addMinutes, addDays } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import {
+  addMilliseconds,
+  addMinutes,
+  addDays,
+  parseISO,
+  differenceInCalendarDays,
+} from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
 
 import {
@@ -7,8 +13,10 @@ import {
   AirRoute,
   capacity,
   Flight,
+  FlightBookingSelection,
   FRIDAY,
   getTimetableDayFromDate,
+  maximumBookingDay,
   MONDAY,
   SATURDAY,
   SUNDAY,
@@ -116,15 +124,20 @@ export function getFlights(
   schedule: Schedule,
   origin: Airport,
   destination: Airport,
-): { timetableFlight: TimetableFlight; flights: Flight[] }[] {
+  selectedDate: string,
+): FlightBookingSelection {
   const route = schedule.routes.find(
     (r) => r.origin === origin && r.destination === destination,
   );
+
+  const selected = parseISO(selectedDate);
 
   if (route !== undefined) {
     if (route.timetableFlights === undefined) {
       route.timetableFlights = createTimetableFlights(route);
     }
+
+    // TODO now we want this date in the origin timezone - not the users timezone
 
     const todayLocal = new Date();
     const todayUTC = new Date(
@@ -138,7 +151,7 @@ export function getFlights(
       ),
     );
 
-    return route.timetableFlights
+    const flights = route.timetableFlights
       .map((t) => {
         if (t.flights === undefined) {
           t.flights = createFlights(todayUTC, t);
@@ -147,8 +160,9 @@ export function getFlights(
         return { timetableFlight: asTimetableFlight(t), flights: flights };
       })
       .filter((d) => d.flights.length > 0);
+    return { requestedDate: selected, flights: flights };
   } else {
-    return [];
+    return { requestedDate: selected, flights: [] };
   }
 }
 
@@ -524,7 +538,6 @@ function createFlights(
   timetableFlight: ServerTimetableFlight,
 ): ServerFlight[] {
   const rnd = new PsuedoRandom(timetableFlight.randomSeed);
-  const numDays = 42; // create 6 weeks out
   const tz = timezone(timetableFlight.route.origin);
 
   const createEmptySeatsAndPrice = (daysTillFlight: number) => {
@@ -551,10 +564,12 @@ function createFlights(
         bookedPercent = rnd.flat(0.4, 0.75);
         break;
     }
-    if (daysTillFlight > numDays) {
+    if (daysTillFlight > maximumBookingDay) {
       bookedPercent = 0;
     } else if (daysTillFlight > 0) {
-      bookedPercent = (bookedPercent * (numDays - daysTillFlight)) / numDays;
+      bookedPercent =
+        (bookedPercent * (maximumBookingDay - daysTillFlight)) /
+        maximumBookingDay;
     } else {
       bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
     }
@@ -582,7 +597,7 @@ function createFlights(
     return addMinutes(minutes, localMidnight);
   };
 
-  const dayOffsets = [...Array(numDays).keys()].map((i) => i + 1); // we want a base 1 list as will not book a flight for today
+  const dayOffsets = [...Array(maximumBookingDay).keys()].map((i) => i + 1); // we want a base 1 list as will not book a flight for today
 
   // could not use eachDayOfInterval here as it does not cope with timezones very well
 

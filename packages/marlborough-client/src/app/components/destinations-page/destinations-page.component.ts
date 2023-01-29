@@ -12,17 +12,13 @@ import { RouterModule } from '@angular/router';
   templateUrl: './destinations-page.component.html',
   styleUrls: ['./destinations-page.component.scss']
 })
-export class DestinationsPageComponent implements OnInit {
+export class DestinationsPageComponent {
 
-  origins$?: Observable<Airport[]>;
+  origins$ = this._flightService.getOrigins$().pipe(
+    map(o => o.sort((a, b) => cityName(a).localeCompare(cityName(b))))
+  );
 
   constructor(private _flightService: FlightService) {}
-
-  ngOnInit(): void {
-    this.origins$ = this._flightService.getOrigins$().pipe(
-      map(o => o.sort((a, b) => cityName(a).localeCompare(cityName(b))))
-    );
-  }
 
   originName(code: Airport): string {
     return cityName(code);

@@ -254,3 +254,16 @@ bootstrapApplication(AppComponent, {
 Use the common practice to match what would be expected in Angular code
 * '_' prefix for private variables and members
 * '$' suffix for observable variables
+
+## Don't Need OnInit For Observables
+
+This is based on [this article](https://indepth.dev/posts/1508/structure-initialization-logic-without-ngoninit-utilize-observables-and-ngonchanges).
+For observables, we don't need to wait for the OnInit hook, we can initialise the observable straight away. Also means the observable does not have to be nullable.
+```typescript
+export class HomePageComponent {
+
+  origins$ = this._flightService.getOrigins$();
+
+  constructor(private _flightService: FlightService) { }
+}
+```
