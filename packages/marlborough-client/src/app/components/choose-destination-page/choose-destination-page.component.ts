@@ -35,7 +35,13 @@ export class ChooseDestinationPageComponent {
           const withNames = unique.map(o => ({ code: o, cityName: cityName(o) }));
           const sorted = withNames.sort((a, b) => a.cityName.localeCompare(b.cityName));
           const originName = cityName(data.origin);
-          return { origin: { code: data.origin, cityName: originName }, destinationList: sorted };
+          return {
+            origin: {
+              code: data.origin,
+              cityName: originName
+            },
+            destinationList: sorted
+          };
         } else {
           throw Error('Should never get here as we have checked we had an origin parameter')
         }

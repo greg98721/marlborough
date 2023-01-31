@@ -255,17 +255,23 @@ Use the common practice to match what would be expected in Angular code
 * '_' prefix for private variables and members
 * '$' suffix for observable variables
 
-Use observable viewmodels to transfer data to the page - standard name `vm$`
-
-## Don't Need OnInit For Observables
+## Don't Need OnInit For Observables and Viewmodels
 
 This is based on [this article](https://indepth.dev/posts/1508/structure-initialization-logic-without-ngoninit-utilize-observables-and-ngonchanges).
 For observables, we don't need to wait for the OnInit hook, we can initialise the observable straight away. Also means the observable does not have to be nullable.
+
+Use observable viewmodels to transfer data to the page - standard name `vm$`. Also define the type of the viewmodel. Will save a lot of time not having to trace back what it is. For example:
+
 ```typescript
-export class HomePageComponent {
-
-  origins$ = this._flightService.getOrigins$();
-
+export class DestinationsPageComponent {
   constructor(private _flightService: FlightService) { }
+
+  vm$: Observable<{ code: string; name: string; fluff: string }[]> =
+    this._flightService.getOrigins$().pipe(
+      map(o => {
+        const sorted = o.sort((a, b) => cityName(a).localeCompare(cityName(b)));
+        return sorted.map(o => ({ code: o, name: cityName(o), fluff: originFluff(o) }));
+      })
+    );
 }
 ```

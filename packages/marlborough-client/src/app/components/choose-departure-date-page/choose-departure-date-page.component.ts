@@ -5,7 +5,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
 import { Observable, map } from 'rxjs';
-import { addDays, formatISO } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { addDays, formatISOWithOptions } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { Airport, cityName, isAirport, maximumBookingDay, startOfDayInTimezone, timezone } from '@marlborough/model';
 
@@ -32,7 +32,18 @@ export class ChooseDepartureDatePageComponent {
           // we want starting tomorrow as too hard to determine what remains of today
           const earliest = addDays(1, startOfDayInTimezone(originTimeZone, new Date()));
           const latest = addDays(maximumBookingDay, earliest);
-          return { origin: { code: origin, cityName: originName }, destination: { code: destination, cityName: destinationName }, earliest: earliest, latest: latest };
+          return {
+            origin: {
+              code: origin,
+              cityName: originName
+            },
+            destination: {
+              code: destination,
+              cityName: destinationName
+            },
+            earliest: earliest,
+            latest: latest
+          };
         } else {
           throw Error('Something funny going on with the route parameters')
         }
@@ -40,7 +51,7 @@ export class ChooseDepartureDatePageComponent {
     );
 
   dateSelected(origin: Airport, destination: Airport, date: Date) {
-    const datestring = formatISO(date);
+    const datestring = formatISOWithOptions({ representation: 'date' }, date);
     this._router.navigateByUrl(`flights?origin=${origin}&destination=${destination}&date=${datestring}`);
   }
 }

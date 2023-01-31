@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Airport, Flight, FlightBookingSelection, isAirport, TimetableFlight } from '@marlborough/model';
+import { Airport, Flight, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
 import { AppConfigService } from './app-config.service';
 
@@ -45,12 +45,12 @@ export class FlightService {
     )
   }
 
-  getFlights$(origin: string, destination: string, selectedDate: string): Observable<FlightBookingSelection> {
+  getFlights$(origin: string, destination: string): Observable<{ timetableFlight: TimetableFlight; flights: Flight[] }[]> {
     const url = this._config.apiUrl(`flights?origin=${origin}&dest=${destination}`);
     return this._http.get(url).pipe(
       map(response => {
-        const flights = response as FlightBookingSelection;
-        if (flights.flights.every(t => isAirport(t.timetableFlight.route.destination) && isAirport(t.timetableFlight.route.origin))) {
+        const flights = response as { timetableFlight: TimetableFlight; flights: Flight[] }[];
+        if (flights.every(t => isAirport(t.timetableFlight.route.destination) && isAirport(t.timetableFlight.route.origin))) {
           // this is mainly to catch the server and client being out of synch in list of airports
           return flights;
         } else {

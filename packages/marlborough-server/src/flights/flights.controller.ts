@@ -1,3 +1,4 @@
+import { Flight, TimetableFlight } from '@marlborough/model';
 import { Controller, Get, Query } from '@nestjs/common';
 import { ScheduleService } from '../schedule/schedule.service';
 
@@ -9,8 +10,7 @@ export class FlightsController {
   getFlights(
     @Query('origin') origin: string,
     @Query('dest') dest: string,
-    @Query('date') selectedDate: string,
-  ) {
-    return this._scheduleService.flights(origin, dest, selectedDate);
+  ): { timetableFlight: TimetableFlight; flights: Flight[] }[] {
+    return this._scheduleService.flights(origin, dest);
   }
 }

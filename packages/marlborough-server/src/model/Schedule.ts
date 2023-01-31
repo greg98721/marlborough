@@ -1,10 +1,4 @@
-import {
-  addMilliseconds,
-  addMinutes,
-  addDays,
-  parseISO,
-  differenceInCalendarDays,
-} from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { addMilliseconds, addMinutes, addDays } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
 
 import {
@@ -13,12 +7,12 @@ import {
   AirRoute,
   capacity,
   Flight,
-  FlightBookingSelection,
   FRIDAY,
   getTimetableDayFromDate,
   maximumBookingDay,
   MONDAY,
   SATURDAY,
+  startOfDayInTimezone,
   SUNDAY,
   THURSDAY,
   TimetableFlight,
@@ -124,45 +118,29 @@ export function getFlights(
   schedule: Schedule,
   origin: Airport,
   destination: Airport,
-  selectedDate: string,
-): FlightBookingSelection {
+): { timetableFlight: TimetableFlight; flights: Flight[] }[] {
   const route = schedule.routes.find(
     (r) => r.origin === origin && r.destination === destination,
   );
-
-  const selected = parseISO(selectedDate);
 
   if (route !== undefined) {
     if (route.timetableFlights === undefined) {
       route.timetableFlights = createTimetableFlights(route);
     }
 
-    // TODO now we want this date in the origin timezone - not the users timezone
+    const start = startOfDayInTimezone(timezone(origin), new Date());
 
-    const todayLocal = new Date();
-    const todayUTC = new Date(
-      Date.UTC(
-        todayLocal.getFullYear(),
-        todayLocal.getMonth(),
-        todayLocal.getDate(),
-        0,
-        0,
-        0,
-      ),
-    );
-
-    const flights = route.timetableFlights
+    return route.timetableFlights
       .map((t) => {
         if (t.flights === undefined) {
-          t.flights = createFlights(todayUTC, t);
+          t.flights = createFlights(start, t);
         }
         const flights = t.flights.map((f) => asFlight(f));
         return { timetableFlight: asTimetableFlight(t), flights: flights };
       })
       .filter((d) => d.flights.length > 0);
-    return { requestedDate: selected, flights: flights };
   } else {
-    return { requestedDate: selected, flights: [] };
+    throw new Error(`Could not find route for ${origin} to ${destination}`);
   }
 }
 
@@ -534,7 +512,7 @@ function createTimetableFlights(
 }
 
 function createFlights(
-  today: Date,
+  start: Date,
   timetableFlight: ServerTimetableFlight,
 ): ServerFlight[] {
   const rnd = new PsuedoRandom(timetableFlight.randomSeed);
@@ -598,12 +576,11 @@ function createFlights(
   };
 
   const dayOffsets = [...Array(maximumBookingDay).keys()].map((i) => i + 1); // we want a base 1 list as will not book a flight for today
-
   // could not use eachDayOfInterval here as it does not cope with timezones very well
 
   return dayOffsets
     .map((o) => {
-      const day = addDays(o, today);
+      const day = addDays(o, start);
       return { daysTillFlight: o, day: day };
     })
     .filter((d) => {

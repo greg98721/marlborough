@@ -12,9 +12,19 @@ function calculateInTimezone(fn: (dt: Date) => Date, timezone: string, d: Date):
 }
 
 export function startOfDayInTimezone(timezone: string, d: Date): Date {
-  return calculateInTimezone(startOfDay, timezone, d);
+  const u = d.getTime();
+  const z = utcToZonedTime(u, timezone);
+  const r = startOfDay(z);
+  return r;
 }
 
 export function endOfDayInTimezone(timezone: string, d: Date): Date {
-  return calculateInTimezone(endOfDay, timezone, d);
+  const u = d.getTime();
+  const z = utcToZonedTime(u, timezone);
+  const r = endOfDay(z);
+  return r;
+}
+
+export function toTimezone(timezone: string, d: Date): Date {
+  return utcToZonedTime(d, timezone);
 }
