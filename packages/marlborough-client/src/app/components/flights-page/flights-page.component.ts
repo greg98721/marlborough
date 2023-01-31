@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { Observable, map } from 'rxjs';
-import { parseISO, addDays, differenceInDays, isBefore, isAfter } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { formatISOWithOptions, parseISO, addDays, differenceInCalendarDays, isBefore, isAfter, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone } from '@marlborough/model';
 
@@ -24,28 +24,30 @@ export class FlightsPageComponent {
         const sel = parseISO(allflights.selectedDate);
         const selected = startOfDayInTimezone(originTimeZone, sel);
         const earliest = addDays(1, startOfDayInTimezone(originTimeZone, new Date()));
-        const gap = differenceInDays(earliest, selected);
+        const gap = differenceInCalendarDays(earliest, selected);
 
         // we ant a five day selection around the selected date taking into account where the selected date is near one end of the possible range
         let start: Date;
+        let end: Date;
         if (gap < 3) {
           start = earliest;
-        } else if (gap > (maximumBookingDay - 3)) {
-          start = addDays(maximumBookingDay - 5, earliest);
+          end = addDays(3 + gap, start);
+        } else if (gap > (maximumBookingDay - 2)) {
+          start = addDays(-2, selected);
+          end = addDays(maximumBookingDay + 1, earliest);
         } else {
           start = addDays(-2, selected);
+          end = addDays(5, start);
         }
-        const end = addDays(5, start);
+
         const withinRange = allflights.flights.map(f => {
-          const within = f.flights.filter(w => isBetween(w.date, start, end));
+          const within = f.flights.filter(w => {
+            const flightDate = parseISO(w.date);
+            return (isBefore(flightDate, start) || isEqual(flightDate, start)) && isBefore(end, flightDate);
+          });
           return { timetableFlight: f.timetableFlight, flights: within };
         });
         const filtered = withinRange.filter(f => f.flights.length > 0);
         return { origin: allflights.origin, flights: filtered, selected: selected };
       }));
-}
-
-function isBetween(x: Date, a: Date, b: Date): boolean {
-  const r = isAfter(x, a) && isBefore(x, b);
-  return r;
 }

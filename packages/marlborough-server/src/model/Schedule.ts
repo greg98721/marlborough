@@ -1,6 +1,10 @@
-import { addMilliseconds, addMinutes, addDays } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import {
+  addDays,
+  formatISOWithOptions,
+  eachDayOfInterval,
+  differenceInCalendarDays,
+} from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
-
 import {
   Aircraft,
   Airport,
@@ -128,7 +132,10 @@ export function getFlights(
       route.timetableFlights = createTimetableFlights(route);
     }
 
-    const start = startOfDayInTimezone(timezone(origin), new Date());
+    const start = addDays(
+      1,
+      startOfDayInTimezone(timezone(origin), new Date()),
+    );
 
     return route.timetableFlights
       .map((t) => {
@@ -432,6 +439,12 @@ function createTimetableFlights(
   ) {
     aircraft = 'A220-100';
   }
+
+  // This is a fudge as the timezones change with the date because of daylight saving - this is enough for a demo
+  const originTzOffset = getTimezoneOffset(timezone(route.origin));
+  const destinationTzOffset = getTimezoneOffset(timezone(route.destination));
+  const timezoneDelta = (destinationTzOffset - originTzOffset) / 1000;
+
   const speed = aircraft === 'ATR42' ? 500 : 800;
   const flightTime = (route.distance / speed) * 60.0 + 25; // the 25 min is landing taxying etc.
   const basePrice = aircraft === 'ATR42' ? flightTime * 2 : flightTime * 1.2; // jet is cheaper than turboprop
@@ -441,10 +454,6 @@ function createTimetableFlights(
 
   const depatureTimes: { days: number; departure: number }[] = [];
 
-  const randomTimeWithinInterval = (r0: number, r1: number): number => {
-    return rnd.gaussian(r0, r1) * 60.0;
-  };
-
   const divideDay = (days: number, n: number, fromT: number, toT: number) => {
     if (n === 0) {
       return;
@@ -452,7 +461,7 @@ function createTimetableFlights(
     for (let i = 0; i < n; i++) {
       const r0 = (i * (toT - fromT)) / n + fromT;
       const r1 = r0 + (toT - fromT) / n;
-      const d = randomTimeWithinInterval(r0, r1);
+      const d = rnd.gaussian(r0, r1) * 60.0;
       depatureTimes.push({ days: days, departure: d });
     }
   };
@@ -463,7 +472,7 @@ function createTimetableFlights(
       const days = rnd.withinPrecent(50)
         ? MONDAY + THURSDAY + SATURDAY
         : SUNDAY + WEDNESDAY + FRIDAY;
-      const dep = randomTimeWithinInterval(10, 16);
+      const dep = rnd.gaussian(10, 16) * 60.0;
       depatureTimes.push({ days: days, departure: dep });
       break;
     case 1:
@@ -493,7 +502,7 @@ function createTimetableFlights(
   }
 
   return depatureTimes.map((t) => {
-    const arrives = t.departure + flightDuration;
+    const arrives = t.departure + flightDuration - timezoneDelta;
     const flightNumber = `MA${currentFlightNumber.toString().padStart(3, '0')}`;
     currentFlightNumber++;
 
@@ -516,9 +525,9 @@ function createFlights(
   timetableFlight: ServerTimetableFlight,
 ): ServerFlight[] {
   const rnd = new PsuedoRandom(timetableFlight.randomSeed);
-  const tz = timezone(timetableFlight.route.origin);
 
-  const createEmptySeatsAndPrice = (daysTillFlight: number) => {
+  const createEmptySeatsAndPrice = (dayOfFlight: Date) => {
+    const daysTillFlight = differenceInCalendarDays(start, dayOfFlight);
     // TODO calculate number of seats booked - depends on how soon is the flight - size of flight and rush hour
     // use a sin curve for bookings over the 6 weeks before the flight
     let bookedPercent: number;
@@ -568,31 +577,17 @@ function createFlights(
     };
   };
 
-  /** The time of the PlainDate is 00:00 UTC so adjust to 00:00 in the local timezone before adding time */
-  const createLocalDateTime = (d: Date, minutes: number): Date => {
-    const localOffset = getTimezoneOffset(tz, d); // note use the date to cope with daylight savings changes
-    const localMidnight = addMilliseconds(-localOffset, d);
-    return addMinutes(minutes, localMidnight);
-  };
-
-  const dayOffsets = [...Array(maximumBookingDay).keys()].map((i) => i + 1); // we want a base 1 list as will not book a flight for today
-  // could not use eachDayOfInterval here as it does not cope with timezones very well
-
-  return dayOffsets
-    .map((o) => {
-      const day = addDays(o, start);
-      return { daysTillFlight: o, day: day };
-    })
+  return eachDayOfInterval({ start: start, end: addDays(42, start) })
     .filter((d) => {
       // first filter the days when there is no flight
-      const t = getTimetableDayFromDate(d.day);
+      const t = getTimetableDayFromDate(d);
       return (t & timetableFlight.days) > 0;
     })
     .map((d) => {
-      const e = createEmptySeatsAndPrice(d.daysTillFlight);
+      const e = createEmptySeatsAndPrice(d);
       return {
         flightNumber: timetableFlight.flightNumber,
-        date: createLocalDateTime(d.day, timetableFlight.departs),
+        date: formatISOWithOptions({ representation: 'date' }, d),
         emptySeats: e.emptySeats,
         price: e.price,
         departed: undefined,

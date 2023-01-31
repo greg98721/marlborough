@@ -2,7 +2,8 @@ import { TimetableFlight } from "./timetableFlight";
 
 export interface Flight {
   flightNumber: string;
-  date: Date;
+  /** ISO format date only */
+  date: string;
   emptySeats: number;
   /** NZD */
   price: number;
