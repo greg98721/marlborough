@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { Observable, map } from 'rxjs';
-import { formatISOWithOptions, parseISO, addDays, differenceInCalendarDays, isBefore, isAfter, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { eachDayOfInterval, parseISO, addDays, differenceInCalendarDays, isBefore, isSameDay, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone } from '@marlborough/model';
 
@@ -16,38 +16,36 @@ import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlig
 export class FlightsPageComponent {
   constructor(private _route: ActivatedRoute, private _router: Router) { }
 
-  vm$: Observable<{ origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selected: Date }> =
+  vm$: Observable<{ origin: Airport, flightData: { timetableFlight: TimetableFlight; flights: (Flight | undefined)[] }[]; selected: Date, dayRange: Date[] }> =
     this._route.data.pipe(
       map(t => {
-        const allflights = t['airport'] as { origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selectedDate: string };
-        const originTimeZone = timezone(allflights.origin);
-        const sel = parseISO(allflights.selectedDate);
+        const allTimetableFlights = t['airport'] as { origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selectedDate: string };
+        const originTimeZone = timezone(allTimetableFlights.origin);
+        const sel = parseISO(allTimetableFlights.selectedDate);
         const selected = startOfDayInTimezone(originTimeZone, sel);
         const earliest = addDays(1, startOfDayInTimezone(originTimeZone, new Date()));
-        const gap = differenceInCalendarDays(earliest, selected);
 
         // we ant a five day selection around the selected date taking into account where the selected date is near one end of the possible range
-        let start: Date;
-        let end: Date;
+        const gap = differenceInCalendarDays(earliest, selected);
+        let dayRange: Date[];
         if (gap < 3) {
-          start = earliest;
-          end = addDays(3 + gap, start);
+          dayRange = eachDayOfInterval({ start: earliest, end: addDays(4, earliest)})
         } else if (gap > (maximumBookingDay - 2)) {
-          start = addDays(-2, selected);
-          end = addDays(maximumBookingDay + 1, earliest);
+          dayRange = eachDayOfInterval({ start: addDays(maximumBookingDay - 4, earliest), end: addDays(maximumBookingDay, earliest)})
         } else {
-          start = addDays(-2, selected);
-          end = addDays(5, start);
+          dayRange = eachDayOfInterval({ start: addDays(-2, selected), end: addDays(+2, selected)})
         }
 
-        const withinRange = allflights.flights.map(f => {
-          const within = f.flights.filter(w => {
-            const flightDate = parseISO(w.date);
-            return (isBefore(flightDate, start) || isEqual(flightDate, start)) && isBefore(end, flightDate);
-          });
-          return { timetableFlight: f.timetableFlight, flights: within };
+        if (dayRange.length !== 5) {
+          throw new Error(`Did not create valid day range - length = ${dayRange.length}`);
+        }
+
+        const withinRange = allTimetableFlights.flights.map(f => {
+          const parsed = f.flights.map(p => ({ date: parseISO(p.date), flight: p}));
+          const filtered = dayRange.map(d => parsed.find(p => isSameDay(p.date, d))?.flight);
+          return { timetableFlight: f.timetableFlight, flights: filtered };
         });
         const filtered = withinRange.filter(f => f.flights.length > 0);
-        return { origin: allflights.origin, flights: filtered, selected: selected };
+        return { origin: allTimetableFlights.origin, flightData: filtered, selected: selected, dayRange: dayRange };
       }));
 }
