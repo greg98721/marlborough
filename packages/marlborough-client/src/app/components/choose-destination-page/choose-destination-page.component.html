@@ -1,7 +1,7 @@
 <div *ngIf="vm$ | async as vm" class="layout">
-  <div class="origin-summary">Taking off from {{vm.origin.cityName}}</div>
+  <div class="origin-summary">Taking off from {{vm.origin | cityName}}</div>
   <div class="question">Flying to?</div>
   <div class="destination-list">
-    <a *ngFor="let destination of vm.destinationList" [routerLink]="['/choose', vm.origin.code, destination.code]">{{ destination.cityName }}</a>
+    <a *ngFor="let destination of vm.destinationList" [routerLink]="['/choose', vm.origin, destination]">{{ destination | cityName }}</a>
   </div>
 </div>

@@ -7,9 +7,9 @@
   grid-template-rows: 1fr max-content 0.5fr max-content 1fr;
   grid-template-areas:
     ". ."
-    "main main"
+    "main-area main-area"
     ". ."
-    "action_1 action_2"
+    "action_1-area action_2-area"
     ". .";
 
   @media (max-width: $narrow-breakpoint) {
@@ -17,11 +17,11 @@
     grid-template-rows: 1fr max-content 0.25fr max-content 0.25fr max-content 1fr;
     grid-template-areas:
       "."
-      "main"
+      "main-area"
       "."
-      "action_1"
+      "action_1-area"
       "."
-      "action_2"
+      "action_2-area"
       ".";
   }
   @media (min-width: $wide-breakpoint) {
@@ -29,15 +29,15 @@
     grid-template-rows: 1fr max-content 0.5fr max-content 1fr;
     grid-template-areas:
       ". . . ."
-      ". main main ."
+      ". main-area main-area ."
       ". . . ."
-      ". action_1 action_2 ."
+      ". action_1-area action_2-area ."
       ". . . .";
   }
 }
 
 .headline {
-  grid-area: main;
+  grid-area: main-area;
   text-align: center;
   font-size: 12vw;
   line-height: 14vw;
@@ -58,12 +58,12 @@
 }
 
 .timetable-link {
-  grid-area: action_1;
+  grid-area: action_1-area;
   text-align: left;
 }
 
 .booking-link {
-  grid-area: action_2;
+  grid-area: action_2-area;
   text-align: right;
 }
 

@@ -6,11 +6,13 @@ import { addMinutes, format } from 'date-fns/fp';
 import { Observable, map } from 'rxjs';
 import { Airport, cityName, isAirport, TimetableFlight } from '@marlborough/model';
 import { WeekDisplayComponent } from '../week-display/week-display.component';
+import { MinutePipe } from '../../pipes/minute.pipe';
+import { CityNamePipe } from 'src/app/pipes/city-name.pipe';
 
 @Component({
   selector: 'app-timetable-page',
   standalone: true,
-  imports: [CommonModule, WeekDisplayComponent, RouterModule],
+  imports: [CommonModule, WeekDisplayComponent, RouterModule, MinutePipe, CityNamePipe],
   templateUrl: './timetable-page.component.html',
   styleUrls: ['./timetable-page.component.scss']
 })
@@ -29,7 +31,7 @@ export class TimetablePageComponent {
       })
     );
 
-  timetables$: Observable<{ destination: string; destCode: Airport, timetables: TimetableFlight[] }[]> =
+  timetables$: Observable<{ destination: Airport, timetables: TimetableFlight[] }[]> =
     this._route.data.pipe(
       map(t => {
         const data = t['origin'] as { origin: Airport; timetable: TimetableFlight[] };
@@ -39,15 +41,9 @@ export class TimetablePageComponent {
         const unique = [...new Set(a)];
 
         return unique.map(u => {
-          const name = cityName(u);
           const s = data.timetable.filter(t => t.route.destination === u).sort((a, b) => a.departs >= b.departs ? 1 : -1);
-          return { destination: name, destCode: u, timetables: s };
-        }).sort((a, b) => a.destination.localeCompare(b.destination));
+          return { destination: u, timetables: s };
+        }).sort((a, b) => cityName(a.destination).localeCompare(cityName(b.destination)));
       })
     );
-
-  formatTime(minutes: number): string {
-    // we need a date, even though it will disappear when we format it again
-    return format('p', addMinutes(minutes, new Date(2023, 1, 1, 0, 0, 0)));
-  }
 }

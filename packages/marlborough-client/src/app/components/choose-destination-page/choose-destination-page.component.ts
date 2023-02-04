@@ -5,18 +5,19 @@ import { FlightService } from 'src/app/services/flight.service';
 import { Airport, cityName, isAirport } from '@marlborough/model';
 import { Observable, map, switchMap } from 'rxjs';
 import { LoadingService } from 'src/app/services/loading.service';
+import { CityNamePipe } from 'src/app/pipes/city-name.pipe';
 
 @Component({
   selector: 'app-choose-destination-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CityNamePipe],
   templateUrl: './choose-destination-page.component.html',
   styleUrls: ['./choose-destination-page.component.scss']
 })
 export class ChooseDestinationPageComponent {
   constructor(private _flightService: FlightService, private _route: ActivatedRoute, private _loadingService: LoadingService) { }
 
-  vm$: Observable<{ origin: { code: Airport; cityName: string }; destinationList: { code: Airport; cityName: string }[] }> =
+  vm$: Observable<{ origin: Airport; destinationList: Airport[] }> =
     this._route.paramMap.pipe(
       switchMap(p => {
         const origin = p.get('origin');
@@ -32,14 +33,9 @@ export class ChooseDestinationPageComponent {
           // get the unique destinations
           const a = data.timetable.map(t => t.route.destination);
           const unique = [...new Set(a)];
-          const withNames = unique.map(o => ({ code: o, cityName: cityName(o) }));
-          const sorted = withNames.sort((a, b) => a.cityName.localeCompare(b.cityName));
-          const originName = cityName(data.origin);
+          const sorted = unique.sort((a, b) => cityName(a).localeCompare(cityName(b)));
           return {
-            origin: {
-              code: data.origin,
-              cityName: originName
-            },
+            origin: data.origin,
             destinationList: sorted
           };
         } else {

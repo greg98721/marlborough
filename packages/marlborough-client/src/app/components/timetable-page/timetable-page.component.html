@@ -11,13 +11,13 @@
   <div><!--Empty space for margins --></div>
   <ng-container *ngFor="let dest of timetables$ | async">
     <div><!--Empty space for margins --></div>
-    <a [routerLink]="['/timetable', dest.destCode]" class="destination">{{ dest.destination}}</a>
+    <a [routerLink]="['/timetable', dest.destination]" class="destination">{{ dest.destination | cityName}}</a>
     <div><!--Empty space for margins --></div>
     <ng-container *ngFor="let timetable of dest.timetables">
       <div><!--Empty space for margins --></div>
       <div class="table-content">{{ timetable.flightNumber }}</div>
-      <div class="table-content">{{ formatTime(timetable.departs) }}</div>
-      <div class="table-content">{{ formatTime(timetable.arrives) }}</div>
+      <div class="table-content">{{ timetable.departs | minute }}</div>
+      <div class="table-content">{{ timetable.arrives | minute }}</div>
       <div class="table-content">{{ timetable.aircraft }}</div>
       <app-week-display [days]="timetable.days"></app-week-display>
       <div><!--Empty space for margins --></div>

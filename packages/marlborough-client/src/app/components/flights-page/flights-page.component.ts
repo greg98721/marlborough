@@ -5,11 +5,12 @@ import { Observable, map } from 'rxjs';
 import { eachDayOfInterval, parseISO, addDays, differenceInCalendarDays, isBefore, isSameDay, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone } from '@marlborough/model';
+import { MinutePipe } from '../../pipes/minute.pipe';
 
 @Component({
   selector: 'app-flights-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MinutePipe],
   templateUrl: './flights-page.component.html',
   styleUrls: ['./flights-page.component.scss']
 })
@@ -45,7 +46,8 @@ export class FlightsPageComponent {
           const filtered = dayRange.map(d => parsed.find(p => isSameDay(p.date, d))?.flight);
           return { timetableFlight: f.timetableFlight, flights: filtered };
         });
-        const filtered = withinRange.filter(f => f.flights.length > 0);
-        return { origin: allTimetableFlights.origin, flightData: filtered, selected: selected, dayRange: dayRange };
+        const filtered = withinRange.filter(f => f.flights.filter(l => l).length > 0);
+        const sorted = filtered.sort((a, b) => (a.timetableFlight.departs - b.timetableFlight.departs));
+        return { origin: allTimetableFlights.origin, flightData: sorted, selected: selected, dayRange: dayRange };
       }));
 }

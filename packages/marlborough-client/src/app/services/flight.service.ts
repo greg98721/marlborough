@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Airport, Flight, isAirport, TimetableFlight } from '@marlborough/model';
+import { Airport, cityName, Flight, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
 import { AppConfigService } from './app-config.service';
 
@@ -17,9 +17,9 @@ export class FlightService {
     return this._http.get(url).pipe(
       map(response => {
         const rawList = response as string[];
-        if (rawList.every(isAirport)) {
-          // this is mainly to catch the server and client being out of synch in list of airports
-          return rawList as Airport[];
+        if (rawList.every(isAirport)) { // this is mainly to catch the server and client being out of synch in list of airports
+          const sorted = rawList.sort((a, b) => cityName(a).localeCompare(cityName(b)));  // we will want to display this sorted each time
+          return sorted as Airport[];
         } else {
           throw new TypeError('Invalid airport in getting list of origins from server');
         }

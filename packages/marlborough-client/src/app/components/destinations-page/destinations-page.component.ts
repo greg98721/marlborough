@@ -4,23 +4,21 @@ import { FlightService } from 'src/app/services/flight.service';
 import { Observable, map } from 'rxjs';
 import { Airport, cityName } from '@marlborough/model';
 import { RouterModule } from '@angular/router';
+import { CityNamePipe } from 'src/app/pipes/city-name.pipe';
 
 @Component({
   selector: 'app-destinations-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CityNamePipe],
   templateUrl: './destinations-page.component.html',
   styleUrls: ['./destinations-page.component.scss']
 })
 export class DestinationsPageComponent {
   constructor(private _flightService: FlightService) { }
 
-  vm$: Observable<{ code: string; name: string; fluff: string }[]> =
+  vm$: Observable<{ code: Airport; fluff: string }[]> =
     this._flightService.getOrigins$().pipe(
-      map(o => {
-        const sorted = o.sort((a, b) => cityName(a).localeCompare(cityName(b)));
-        return sorted.map(o => ({ code: o, name: cityName(o), fluff: originFluff(o) }));
-      })
+      map(l => l.map(o => ({ code: o, fluff: originFluff(o) })))
     );
 }
 

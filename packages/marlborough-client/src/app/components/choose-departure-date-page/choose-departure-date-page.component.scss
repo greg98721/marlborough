@@ -7,9 +7,9 @@
   grid-template-rows: 0.5fr max-content max-content max-content 0.5fr;
   grid-template-areas:
     ". . . ."
-    ". . origin-summary-block ."
-    ". . destination-summary-block ."
-    ". date-question-block date-picker-block ."
+    ". . origin-summary-area ."
+    ". . destination-summary-area ."
+    ". date-question-area date-picker-area ."
     ". . . .";
 
   @media (max-width: $narrow-breakpoint) {
@@ -18,20 +18,20 @@
     grid-template-rows: 0.5fr max-content max-content max-content max-content 0.5fr;
     grid-template-areas:
       "."
-      "origin-summary-block"
-      "destination-summary-block"
-      "date-question-block"
-      "date-picker-block"
+      "origin-summary-area"
+      "destination-summary-area"
+      "date-question-area"
+      "date-picker-area"
       ".";
   }
 }
 
 .origin-summary {
-  grid-area: origin-summary-block;
+  grid-area: origin-summary-area;
 }
 
 .destination-summary {
-  grid-area: destination-summary-block;
+  grid-area: destination-summary-area;
 }
 
 .origin-summary,
@@ -48,7 +48,7 @@
 }
 
 .date-question {
-  grid-area: date-question-block;
+  grid-area: date-question-area;
   font-size: 2.5rem;
   line-height: 3rem;
   @media (max-width: $narrow-breakpoint) {
@@ -58,7 +58,7 @@
 }
 
 .date-picker {
-  grid-area: date-picker-block;
+  grid-area: date-picker-area;
   border: 1px solid rgba($accent-color, 0.5);
   background-color: rgba($opposite-text-color, 0.15);
 }

@@ -1,0 +1,63 @@
+@use "../../../styles.scss" as *;
+
+.layout {
+  display: grid;
+  grid-template-columns: auto repeat(5, 0.2fr);
+  border-bottom: 1px solid $dull-primary-color;
+  border-right: 1px solid $dull-primary-color;
+}
+
+.date-block {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  padding: 0.2rem;
+}
+
+.timetable-block {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  padding: 0.2rem 1rem;
+}
+
+.flight-block {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  align-items: center;
+  padding: 0.2rem;
+}
+
+.date-block, .timetable-block, .flight-block {
+  border-top: 1px solid $dull-primary-color;
+  border-left: 1px solid $dull-primary-color;
+}
+
+.date-block, .timetable-block {
+  background-color: rgba($dull-primary-color, 0.3);
+}
+
+.departs, .price, .arrives {
+  font-size: 2rem;
+  line-height: 2rem;
+  @media (max-width: $narrow-breakpoint) {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+  }
+}
+
+.fully-booked, .date-block {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  @media (max-width: $narrow-breakpoint) {
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+  }
+}
+
+.fully-booked {
+  color: $primary-color;
+}

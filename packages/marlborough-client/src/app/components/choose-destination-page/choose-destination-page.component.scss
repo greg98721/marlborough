@@ -7,8 +7,8 @@
   grid-template-rows: 0.5fr max-content max-content 0.5fr;
   grid-template-areas:
     ". . . ."
-    ". . origin-summary-block ."
-    ". destination-question-block destination-list-block ."
+    ". . origin-summary-area ."
+    ". destination-question-area destination-list-area ."
     ". . . .";
 
   @media (max-width: $narrow-breakpoint) {
@@ -17,15 +17,15 @@
     grid-template-rows: 0.5fr max-content max-content max-content 0.5fr;
     grid-template-areas:
       "."
-      "origin-summary-block"
-      "destination-question-block"
-      "destination-list-block"
+      "origin-summary-area"
+      "destination-question-area"
+      "destination-list-area"
       ".";
   }
 }
 
 .origin-summary {
-  grid-area: origin-summary-block;
+  grid-area: origin-summary-area;
   font-size: 2.5rem;
   line-height: 3rem;
   margin-bottom: 1.5rem;
@@ -38,7 +38,7 @@
 }
 
 .question {
-  grid-area: destination-question-block;
+  grid-area: destination-question-area;
   font-size: 2.5rem;
   line-height: 3rem;
   @media (max-width: $narrow-breakpoint) {
@@ -48,7 +48,7 @@
 }
 
 .destination-list {
-  grid-area: destination-list-block;
+  grid-area: destination-list-area;
   display: grid;
   grid-template-columns: 1fr;
   a {
