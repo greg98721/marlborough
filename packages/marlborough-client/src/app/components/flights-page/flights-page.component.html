@@ -1,54 +1,21 @@
 <div *ngIf="vm$ | async as vm" class="layout">
   <div></div>
-  <div class="date-block">
-    <div>{{ vm.dayRange[0] | date:'cccc' }}</div>
-    <div>{{ vm.dayRange[0] | date:'d LLLL' }}</div>
-  </div>
-  <div class="date-block">
-    <div>{{ vm.dayRange[1] | date:'cccc' }}</div>
-    <div>{{ vm.dayRange[1] | date:'d LLLL' }}</div>
-  </div>
-  <div class="date-block">
-    <div>{{ vm.dayRange[2] | date:'cccc' }}</div>
-    <div>{{ vm.dayRange[2] | date:'d LLLL' }}</div>
-  </div>
-  <div class="date-block">
-    <div>{{ vm.dayRange[3] | date:'cccc' }}</div>
-    <div>{{ vm.dayRange[3] | date:'d LLLL' }}</div>
-  </div>
-  <div class="date-block">
-    <div>{{ vm.dayRange[4] | date:'cccc' }}</div>
-    <div>{{ vm.dayRange[4] | date:'d LLLL' }}</div>
+  <div class="headline">Flights from {{vm.origin | cityName}} to {{vm.destination | cityName}}</div>
+  <div></div>
+  <div class="date-block" *ngFor="let dr of vm.dayRange; let i=index">
+    <div>{{ vm.dayRange[i] | date:'cccc' }}</div>
+    <div>{{ vm.dayRange[i] | date:'d LLLL' }}</div>
   </div>
   <ng-container *ngFor="let timetable of vm.flightData">
     <div class="timetable-block">
-      <div class="departs">{{timetable.timetableFlight.departs | minute }} → {{timetable.timetableFlight.arrives | minute }}</div>
+      <div class="departs"><mat-icon>flight_takeoff</mat-icon><span class="cdk-visually-hidden">Departs</span>{{timetable.timetableFlight.departs | minute }}</div>
+      <div class="arrives"><mat-icon>flight_land</mat-icon><span class="cdk-visually-hidden">Arrives</span>{{timetable.timetableFlight.arrives | minute }}</div>
       <div class="flight-number">{{timetable.timetableFlight.flightNumber}}</div>
     </div>
-    <div class="flight-block">
-      <a *ngIf="timetable.flights[0] && timetable.flights[0].emptySeats > 0" class="price">{{timetable.flights[0].price | currency: 'NZD'}}</a>
-      <div *ngIf="timetable.flights[0] && timetable.flights[0].emptySeats > 0">{{timetable.flights[0].emptySeats}} seats available</div>
-      <div *ngIf="timetable.flights[0] && timetable.flights[0].emptySeats <= 0" class="fully-booked">Fully Booked</div>
-    </div>
-    <div class="flight-block">
-      <a *ngIf="timetable.flights[1] && timetable.flights[1].emptySeats > 0" class="price">{{timetable.flights[1].price | currency: 'NZD'}}</a>
-      <div *ngIf="timetable.flights[1] && timetable.flights[1].emptySeats > 0">{{timetable.flights[1].emptySeats}} seats available</div>
-      <div *ngIf="timetable.flights[1] && timetable.flights[1].emptySeats <= 0" class="fully-booked">Fully Booked</div>
-    </div>
-    <div class="flight-block">
-      <a *ngIf="timetable.flights[2] && timetable.flights[2].emptySeats > 0" class="price">{{timetable.flights[2].price | currency: 'NZD'}}</a>
-      <div *ngIf="timetable.flights[2] && timetable.flights[2].emptySeats > 0">{{timetable.flights[2].emptySeats}} seats available</div>
-      <div *ngIf="timetable.flights[2] && timetable.flights[2].emptySeats <= 0" class="fully-booked">Fully Booked</div>
-    </div>
-    <div class="flight-block">
-      <a *ngIf="timetable.flights[3] && timetable.flights[3].emptySeats > 0" class="price">{{timetable.flights[3].price | currency: 'NZD'}}</a>
-      <div *ngIf="timetable.flights[3] && timetable.flights[3].emptySeats > 0">{{timetable.flights[3].emptySeats}} seats available</div>
-      <div *ngIf="timetable.flights[3] && timetable.flights[3].emptySeats <= 0" class="fully-booked">Fully Booked</div>
-    </div>
-    <div class="flight-block">
-      <a *ngIf="timetable.flights[4] && timetable.flights[4].emptySeats > 0" class="price">{{timetable.flights[4].price | currency: 'NZD'}}</a>
-      <div *ngIf="timetable.flights[4] && timetable.flights[4].emptySeats > 0">{{timetable.flights[4].emptySeats}} seats available</div>
-      <div *ngIf="timetable.flights[4] && timetable.flights[4].emptySeats <= 0" class="fully-booked">Fully Booked</div>
+    <div class="flight-block" *ngFor="let f of timetable.flights; let i=index">
+      <a *ngIf="timetable.flights[i].flightNumber !== '' && timetable.flights[i].emptySeats > 0" class="price">{{timetable.flights[i].price | currency: 'NZD'}}</a>
+      <div *ngIf="timetable.flights[i].flightNumber !== '' && timetable.flights[i].emptySeats > 0" class="seats-available">{{timetable.flights[i].emptySeats}} seats available</div>
+      <div *ngIf="timetable.flights[i].flightNumber !== '' && timetable.flights[i].emptySeats <= 0" class="fully-booked">Fully Booked</div>
     </div>
   </ng-container>
 </div>

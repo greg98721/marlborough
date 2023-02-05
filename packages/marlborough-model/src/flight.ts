@@ -12,3 +12,12 @@ export interface Flight {
 }
 
 export const maximumBookingDay = 42; // up to 6 weeks out
+
+export const EMPTY_FLIGHT ={
+  flightNumber: "",
+  date: "",
+  emptySeats: 0,
+  price: 0,
+  departed: undefined,
+  arrived: undefined,
+};
