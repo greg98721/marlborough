@@ -19,7 +19,7 @@ import { CityNamePipe } from 'src/app/pipes/city-name.pipe';
 export class FlightsPageComponent {
   constructor(private _route: ActivatedRoute, private _router: Router) { }
 
-  vm$: Observable<{ origin: Airport, destination: Airport, flightData: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selected: Date, dayRange: Date[] }> =
+  vm$: Observable<{ origin: Airport, destination: Airport, flightData: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selected: number, dayRange: Date[] }> =
     this._route.data.pipe(
       map(t => {
         const allTimetableFlights = t['airport'] as { origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selectedDate: string };
@@ -32,12 +32,16 @@ export class FlightsPageComponent {
         // we ant a five day selection around the selected date taking into account where the selected date is near one end of the possible range
         const gap = differenceInCalendarDays(earliest, selected);
         let dayRange: Date[];
+        let selIndex: number;
         if (gap < 3) {
           dayRange = eachDayOfInterval({ start: earliest, end: addDays(4, earliest) })
+          selIndex = gap;
         } else if (gap > (maximumBookingDay - 2)) {
           dayRange = eachDayOfInterval({ start: addDays(maximumBookingDay - 4, earliest), end: addDays(maximumBookingDay, earliest) })
+          selIndex = gap - maximumBookingDay + 4;
         } else {
           dayRange = eachDayOfInterval({ start: addDays(-2, selected), end: addDays(+2, selected) })
+          selIndex = 2;
         }
 
         if (dayRange.length !== 5) {
@@ -51,6 +55,6 @@ export class FlightsPageComponent {
         });
         const filtered = withinRange.filter(f => f.flights.filter(l => l.flightNumber !== '').length > 0);
         const sorted = filtered.sort((a, b) => (a.timetableFlight.departs - b.timetableFlight.departs));
-        return { origin: allTimetableFlights.origin, destination: destination, flightData: sorted, selected: selected, dayRange: dayRange };
+        return { origin: allTimetableFlights.origin, destination: destination, flightData: sorted, selected: selIndex, dayRange: dayRange };
       }));
 }
