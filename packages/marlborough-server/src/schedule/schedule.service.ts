@@ -5,12 +5,14 @@ import {
   TimetableFlight,
 } from '@marlborough/model';
 import { Injectable } from '@nestjs/common';
+import { parseISO } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import {
   createSchedule,
   getFlights,
   getOrigins,
   getRoutes,
   getTimetable,
+  getTimetableFlight,
   Schedule,
 } from '../model/schedule';
 
@@ -61,5 +63,9 @@ export class ScheduleService {
         `Tried to convert a non valid airport code ${origin} and/or ${destination} when getting list of flights`,
       );
     }
+  }
+
+  flightToBook(flightNumber: string, dateOfFlight: string) {
+    return getTimetableFlight(this._schedule, flightNumber, dateOfFlight);
   }
 }

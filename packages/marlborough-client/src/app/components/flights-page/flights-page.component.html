@@ -13,7 +13,7 @@
       <div class="arrives"><mat-icon>flight_land</mat-icon><span class="cdk-visually-hidden">Arrives</span>{{timetable.timetableFlight.arrives | minute }}</div>
     </div>
     <div class="flight-block" *ngFor="let f of timetable.flights; let i=index" [ngClass]="{'selected': vm.selected===i}">
-      <a *ngIf="timetable.flights[i].flightNumber !== '' && timetable.flights[i].emptySeats > 0" class="price">{{timetable.flights[i].price | currency: 'NZD'}}</a>
+      <a *ngIf="timetable.flights[i].flightNumber !== '' && timetable.flights[i].emptySeats > 0" [routerLink]="['/booking', timetable.timetableFlight.flightNumber, f.date]" class="price">{{timetable.flights[i].price | currency: 'NZD'}}</a>
       <div *ngIf="timetable.flights[i].flightNumber !== '' && timetable.flights[i].emptySeats > 0" class="seats-available">{{timetable.flights[i].emptySeats}} seats available</div>
       <div *ngIf="timetable.flights[i].flightNumber !== '' && timetable.flights[i].emptySeats <= 0" class="fully-booked">Fully Booked</div>
     </div>

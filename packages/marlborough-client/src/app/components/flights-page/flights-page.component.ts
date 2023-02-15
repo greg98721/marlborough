@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon'
 import { Observable, map } from 'rxjs';
-import { eachDayOfInterval, parseISO, addDays, differenceInCalendarDays, isBefore, isSameDay, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
+import { eachDayOfInterval, formatISOWithOptions, parseISO, addDays, differenceInCalendarDays, isBefore, isSameDay, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone, EMPTY_FLIGHT } from '@marlborough/model';
 import { MinutePipe } from '../../pipes/minute.pipe';
@@ -57,4 +57,8 @@ export class FlightsPageComponent {
         const sorted = filtered.sort((a, b) => (a.timetableFlight.departs - b.timetableFlight.departs));
         return { origin: allTimetableFlights.origin, destination: destination, flightData: sorted, selected: selIndex, dayRange: dayRange };
       }));
+
+    dateFormat(d: Date): string {
+      return formatISOWithOptions({representation: 'date'}, d);
+    }
 }

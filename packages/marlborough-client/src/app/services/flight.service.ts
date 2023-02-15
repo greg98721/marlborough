@@ -23,25 +23,35 @@ export class FlightService {
         } else {
           throw new TypeError('Invalid airport in getting list of origins from server');
         }
-      }),
-      catchError(_ => []) // we have proper http error handling higher up the stack - for here keep things polite
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
     )
   }
 
-  getTimetable$(origin: Airport): Observable<{ origin: Airport; timetable: TimetableFlight[]}> {
+  getTimetable$(origin: Airport): Observable<{ origin: Airport; timetable: TimetableFlight[] }> {
     const url = this._config.apiUrl(`routes/timetable/${origin}`);
     return this._http.get(url).pipe(
       map(response => {
         const rawList = response as any[];
         if (rawList.every(t => isAirport(t.route.destination) && isAirport(t.route.origin))) {
           // this is mainly to catch the server and client being out of synch in list of airports
-          const timetable =  rawList as TimetableFlight[];
+          const timetable = rawList as TimetableFlight[];
           return { origin: origin, timetable: timetable };
         } else {
           throw new TypeError(`Invalid airport in getting list of timetables for ${origin} from server`);
         }
-      }),
-      catchError(_ => []) // we have proper http error handling higher up the stack - for here keep things polite
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
+    )
+  }
+
+  getTimetableFlight$(flightNumber: string, dateOfFlight: string): Observable<{ timetableFlight: TimetableFlight, flight: Flight }> {
+    const url = this._config.apiUrl(`flights/toBook/${flightNumber}/${dateOfFlight}`);
+    return this._http.get(url).pipe(
+      map(response => {
+        return response as { timetableFlight: TimetableFlight, flight: Flight };
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
     )
   }
 
@@ -56,8 +66,8 @@ export class FlightService {
         } else {
           throw new TypeError(`Invalid airport in getting list of timetables for ${origin} from server`);
         }
-      }),
-      catchError(_ => []) // we have proper http error handling higher up the stack - for here keep things polite
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
     )
   }
 }

@@ -3,6 +3,8 @@ import {
   formatISOWithOptions,
   eachDayOfInterval,
   differenceInCalendarDays,
+  format,
+  isSameDay,
 } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
 import {
@@ -118,6 +120,59 @@ export function getTimetable(
     });
 }
 
+export function getTimetableFlight(
+  schedule: Schedule,
+  flightNumber: string,
+  dateOfFlight: string,
+): { timetableFlight: TimetableFlight; flight: Flight } {
+  // this is a bit of a bodge as the timetableFlights may not exist yet so use the base flightnumber to find the route
+  const flightNumberFromString = Number(flightNumber.substring(2));
+  if (!Number.isNaN(flightNumberFromString)) {
+    const baseFlightNumber =
+      flightNumberFromString - (flightNumberFromString % 20);
+
+    const route = schedule.routes.find(
+      (r) => r.flightNumberBlock === baseFlightNumber,
+    );
+    if (route) {
+      const timetableflights = getTimetableFlightsFromRoute(route);
+      const timetableFlight = timetableflights.find(
+        (tf) => tf.timetableFlight.flightNumber === flightNumber,
+      );
+      if (timetableFlight) {
+        const flight = timetableFlight.flights.find(
+          (f) => f.date === dateOfFlight,
+        );
+        if (flight) {
+          return {
+            timetableFlight: timetableFlight.timetableFlight,
+            flight: flight,
+          };
+        } else {
+          throw new Error(
+            `Could not find get number from ${flightNumber} in getTimetableflight`,
+          );
+        }
+      } else {
+        throw new Error(
+          `Could not find timetable flight for ${flightNumber} on ${format(
+            'P pppp',
+            dateOfFlight,
+          )}`,
+        );
+      }
+    } else {
+      throw new Error(
+        `Could not find route from ${flightNumber} in getTimetableflight`,
+      );
+    }
+  } else {
+    throw new Error(
+      `Could not find get number from ${flightNumber} in getTimetableflight`,
+    );
+  }
+}
+
 export function getFlights(
   schedule: Schedule,
   origin: Airport,
@@ -128,27 +183,33 @@ export function getFlights(
   );
 
   if (route !== undefined) {
-    if (route.timetableFlights === undefined) {
-      route.timetableFlights = createTimetableFlights(route);
-    }
-
-    const start = addDays(
-      1,
-      startOfDayInTimezone(timezone(origin), new Date()),
-    );
-
-    return route.timetableFlights
-      .map((t) => {
-        if (t.flights === undefined) {
-          t.flights = createFlights(start, t);
-        }
-        const flights = t.flights.map((f) => asFlight(f));
-        return { timetableFlight: asTimetableFlight(t), flights: flights };
-      })
-      .filter((d) => d.flights.length > 0);
+    return getTimetableFlightsFromRoute(route);
   } else {
     throw new Error(`Could not find route for ${origin} to ${destination}`);
   }
+}
+
+function getTimetableFlightsFromRoute(
+  route: ServerAirRoute,
+): { timetableFlight: TimetableFlight; flights: Flight[] }[] {
+  if (route.timetableFlights === undefined) {
+    route.timetableFlights = createTimetableFlights(route);
+  }
+
+  const start = addDays(
+    1,
+    startOfDayInTimezone(timezone(route.origin), new Date()),
+  );
+
+  return route.timetableFlights
+    .map((t) => {
+      if (t.flights === undefined) {
+        t.flights = createFlights(start, t);
+      }
+      const flights = t.flights.map((f) => asFlight(f));
+      return { timetableFlight: asTimetableFlight(t), flights: flights };
+    })
+    .filter((d) => d.flights.length > 0);
 }
 
 function createRoutes(rnd: PsuedoRandom): ServerAirRoute[] {

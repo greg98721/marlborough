@@ -5,7 +5,7 @@ import {
   HttpEvent,
   HttpInterceptor
 } from '@angular/common/http';
-import { catchError, Observable, retry, throwError, timer } from 'rxjs';
+import { catchError, Observable, retry, throwError, timer, tap } from 'rxjs';
 
 @Injectable()
 export class GlobalHttpErrorHandler implements HttpInterceptor {
@@ -18,12 +18,8 @@ export class GlobalHttpErrorHandler implements HttpInterceptor {
         count: 3,
         delay: (_, retryCount) => timer(retryCount * 1000), // 1 second delay then 2, then 3
       }),
-      catchError(err => {
-        console.log('Error handled by HTTP interceptor...');
-        return throwError(() => {
-          console.log('Error rethrown by HTTP interceptor');
-          return err;
-        });
+      tap({
+        error: () => console.log('HTTP Error: retried 3 times')
       })
     );
   }
