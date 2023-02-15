@@ -5,7 +5,6 @@ import {
   TimetableFlight,
 } from '@marlborough/model';
 import { Injectable } from '@nestjs/common';
-import { parseISO } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import {
   createSchedule,
   getFlights,

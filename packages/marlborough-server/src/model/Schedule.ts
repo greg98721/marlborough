@@ -4,7 +4,6 @@ import {
   eachDayOfInterval,
   differenceInCalendarDays,
   format,
-  isSameDay,
 } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
 import {
