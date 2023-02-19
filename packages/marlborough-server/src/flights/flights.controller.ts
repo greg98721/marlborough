@@ -1,5 +1,6 @@
 import { Flight, TimetableFlight } from '@marlborough/model';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ScheduleService } from '../schedule/schedule.service';
 
 @Controller('flights')
@@ -14,6 +15,7 @@ export class FlightsController {
     return this._scheduleService.flights(origin, dest);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('toBook/:flightNumber/:date')
   getTimetable(
     @Param('flightNumber') flightNumber: string,
