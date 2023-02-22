@@ -6,6 +6,7 @@ import {
   getOrigins,
   getRoutes,
   getTimetable,
+  getTimetableFlight,
   Schedule,
 } from './schedule';
 
@@ -62,5 +63,15 @@ describe('Schedule', () => {
   it('can create flights over the next 7 days', () => {
     const flights = getFlights(schedule, 'NZWB', 'NZWN');
     expect(flights.length).toBeGreaterThan(0);
+  });
+
+  it('can get timetable flights for a given day', () => {
+    const timetableFlights = getFlights(schedule, 'NZWB', 'NZWN');
+    const flightNumber = timetableFlights[0].timetableFlight.flightNumber;
+    const day = timetableFlights[0].flights[0].date;
+    const flight = getTimetableFlight(schedule, flightNumber, day);
+    expect(flight).toBeDefined();
+    expect(flight?.timetableFlight.flightNumber).toBe(flightNumber);
+    expect(flight?.flight.date).toBe(day);
   });
 });

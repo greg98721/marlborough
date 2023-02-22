@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ScheduleService } from '../schedule/schedule.service';
 import { FlightsController } from './flights.controller';
 
@@ -8,7 +9,7 @@ describe('FlightsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FlightsController],
-      providers: [ScheduleService],
+      providers: [ScheduleService, JwtAuthGuard],
     }).compile();
 
     controller = module.get<FlightsController>(FlightsController);
