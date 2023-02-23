@@ -1,3 +1,4 @@
+import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ScheduleService } from '../schedule/schedule.service';
 import { AirRoutesController } from './airRoutes.controller';
@@ -34,6 +35,6 @@ describe('RoutesController', () => {
   it('should only work with a valid airport', () => {
     expect(() => {
       airRoutesController.getRoutes('EGLL');
-    }).toThrowError(TypeError);
+    }).toThrowError(HttpException);
   });
 });

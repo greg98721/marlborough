@@ -24,6 +24,8 @@
             "**/dist": true,
             "**/.angular": true
         },
+        // The following solves a disagreement with what prettier wants and what eslint wants
+        "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
         "workbench.colorCustomizations": {
             "activityBar.activeBackground": "#3a00b8",
             "activityBar.background": "#3a00b8",

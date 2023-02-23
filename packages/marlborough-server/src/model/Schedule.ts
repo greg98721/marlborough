@@ -42,10 +42,9 @@ interface ServerAirRoute extends AirRoute {
 }
 
 function asAirRoute(s: ServerAirRoute): AirRoute {
-  return {
-    origin: s.origin,
-    destination: s.destination,
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, prettier/prettier
+  const { timetableFlights, intensity, distance, flightNumberBlock, randomSeed, ...airRoute } = s;
+  return airRoute;
 }
 
 interface ServerTimetableFlight extends TimetableFlight {
@@ -55,14 +54,9 @@ interface ServerTimetableFlight extends TimetableFlight {
 }
 
 function asTimetableFlight(s: ServerTimetableFlight): TimetableFlight {
-  return {
-    route: s.route,
-    aircraft: s.aircraft,
-    flightNumber: s.flightNumber,
-    departs: s.departs,
-    arrives: s.arrives,
-    days: s.days,
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { flights, basePrice, randomSeed, ...timetableFlight } = s;
+  return timetableFlight;
 }
 
 interface ServerFlight extends Flight {
@@ -72,14 +66,9 @@ interface ServerFlight extends Flight {
 }
 
 function asFlight(s: ServerFlight): Flight {
-  return {
-    flightNumber: s.flightNumber,
-    date: s.date,
-    emptySeats: s.emptySeats,
-    price: s.price,
-    departed: s.departed,
-    arrived: s.arrived,
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { bookings, randomSeed, ...flight } = s;
+  return flight;
 }
 
 export function createSchedule(): Schedule {
