@@ -34,7 +34,7 @@ export interface Schedule {
 }
 
 interface ServerAirRoute extends AirRoute {
-  timetableFlights: ServerTimetableFlight[] | undefined;
+  timetableFlights?: ServerTimetableFlight[];
   intensity: 0 | 1 | 2 | 3;
   distance: number;
   flightNumberBlock: number;
@@ -48,7 +48,7 @@ function asAirRoute(s: ServerAirRoute): AirRoute {
 }
 
 interface ServerTimetableFlight extends TimetableFlight {
-  flights: ServerFlight[] | undefined;
+  flights?: ServerFlight[];
   basePrice: number;
   randomSeed: string;
 }

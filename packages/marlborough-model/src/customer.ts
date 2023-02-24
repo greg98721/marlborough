@@ -3,6 +3,6 @@ export interface Customer {
   lastName: string;
   birthDate: Date;
   address: string;
-  email: string | undefined;
+  email?: string;
   customerCode: string;
 }

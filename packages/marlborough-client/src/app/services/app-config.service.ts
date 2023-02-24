@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class AppConfigService {
 
-  private _apiUrl: string | undefined = undefined;
+  private _apiUrl?: string = undefined;
 
   constructor(private _http: HttpClient) { }
 

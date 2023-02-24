@@ -11,6 +11,7 @@ import { CustomErrorHandler } from './app/custom-error-handler.service';
 import { GlobalHttpErrorHandler } from './app/global-http-error-handler.interceptor';
 import { FlightService } from './app/services/flight.service';
 import { AppConfigService } from './app/services/app-config.service';
+import { AuthInterceptor } from './app/auth-Interceptor';
 
 
 /*
@@ -43,6 +44,11 @@ bootstrapApplication(AppComponent, {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: GlobalHttpErrorHandler,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
       multi: true
     },
     { provide: FlightService, useClass: FlightService }

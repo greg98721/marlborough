@@ -7,8 +7,8 @@ export interface Flight {
   emptySeats: number;
   /** NZD */
   price: number;
-  departed: Date | undefined;
-  arrived: Date | undefined;
+  departed?: Date;
+  arrived?: Date;
 }
 
 export const maximumBookingDay = 42; // up to 6 weeks out
