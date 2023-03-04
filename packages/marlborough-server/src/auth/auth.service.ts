@@ -16,9 +16,11 @@ export class AuthService {
     pass: string,
   ): Promise<User | undefined> {
     const isValid = this._userService.findUser$(username).pipe(
-      map((user) => {
-        if (user !== undefined && user.password === pass) {
-          return { username: user.username } as User;
+      map((u) => {
+        if (u !== undefined && u.password === pass) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { password, ...user } = u;
+          return user;
         } else {
           return undefined;
         }
