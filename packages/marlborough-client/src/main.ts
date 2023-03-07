@@ -12,6 +12,8 @@ import { GlobalHttpErrorHandler } from './app/global-http-error-handler.intercep
 import { FlightService } from './app/services/flight.service';
 import { AppConfigService } from './app/services/app-config.service';
 import { AuthInterceptor } from './app/auth-Interceptor';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 /*
@@ -26,7 +28,9 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(
       BrowserAnimationsModule,
       HttpClientModule,
-      MatSnackBarModule
+      MatSnackBarModule,
+      MatDialogModule,
+      ReactiveFormsModule
     ),
     {
       provide: APP_INITIALIZER,

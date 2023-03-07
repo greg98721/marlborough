@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { User } from '@marlborough/model';
 import { map, Observable, switchMap, of, tap, catchError } from 'rxjs';
-import { LoginDialogComponent } from '../components/login-dialog/login-dialog.component';
 import { AppConfigService } from './app-config.service';
 
 @Injectable({
@@ -14,15 +12,15 @@ export class UserService {
   private _currentUser?: User;
   private _accessToken?: string;
 
-  private _openLoginDialog$(username?: string, message?: string): Observable<{ username: string; password: string } | undefined> {
-    const dialogRef = this._dialog.open(LoginDialogComponent, { data: { username: username, message: message }});
-    return dialogRef.afterClosed().pipe(
-      map((result: { username: string; password: string } | undefined) => {
-        return result
-      }));
+  private _openLoginDialog$ = (username?: string, message?: string): Observable<{ username: string; password: string } | undefined> => {
+    throw new Error('Login dialog not set');
   }
 
-  constructor(private _http: HttpClient, private _config: AppConfigService, public _dialog: MatDialog) {}
+  constructor(private _http: HttpClient, private _config: AppConfigService) {}
+
+  set openLoginDialog(ofd: (username?: string, message?: string) => Observable<{ username: string; password: string } | undefined>) {
+    this._openLoginDialog$ = ofd;
+  }
 
   get currentUser(): User | undefined {
     return this._currentUser;
