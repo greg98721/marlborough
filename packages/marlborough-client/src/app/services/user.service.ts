@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { User } from '@marlborough/model';
+import { inject, Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { map, Observable, switchMap, of, tap, catchError } from 'rxjs';
+import { User } from '@marlborough/model';
+import { LoginDialogComponent } from '../components/login-dialog/login-dialog.component';
 import { AppConfigService } from './app-config.service';
 
 @Injectable({
@@ -12,14 +14,11 @@ export class UserService {
   private _currentUser?: User;
   private _accessToken?: string;
 
-  private _openLoginDialog$ = (username?: string, message?: string): Observable<{ username: string; password: string } | undefined> => {
-    throw new Error('Login dialog not set');
-  }
-
   constructor(private _http: HttpClient, private _config: AppConfigService) {}
 
-  set openLoginDialog(ofd: (username?: string, message?: string) => Observable<{ username: string; password: string } | undefined>) {
-    this._openLoginDialog$ = ofd;
+  login$() : Observable<User | undefined> {
+    const dialog = inject(MatDialog);
+    return this._recursivelogin$(dialog);
   }
 
   get currentUser(): User | undefined {
@@ -30,8 +29,12 @@ export class UserService {
     return this._accessToken;
   }
 
-  login$(username?: string, message?: string): Observable<User | undefined> {
-    return this._openLoginDialog$(username, message).pipe(
+  private _recursivelogin$(dialog: MatDialog, username?: string, message?: string): Observable<User | undefined> {
+    const dialogRef = dialog.open(LoginDialogComponent, { data: { username: username, message: message }});
+    return dialogRef.afterClosed().pipe(
+      map((result: { username: string; password: string } | undefined) => {
+        return result
+      }),
       switchMap(loginDetails => {
         if (loginDetails) {
           const loginUrl = this._config.apiUrl('auth/login');
@@ -41,7 +44,7 @@ export class UserService {
               this._accessToken = response.access_token;
             }),
             switchMap((loginResponse: any) => {
-              const userUrl = this._config.apiUrl(`auth/user/${username}`);
+              const userUrl = this._config.apiUrl(`auth/user/${loginDetails.username}`);
               return this._http.get(userUrl).pipe(
                 map((userResponse: any) => {
                   return {
@@ -56,7 +59,7 @@ export class UserService {
             }),
             catchError((error: any) => {
               // we could not authenticate this user - put up the login dialog again with the error message
-              return this.login$(loginDetails.username, 'Invalid username or password');
+              return this._recursivelogin$(dialog, loginDetails.username, 'Invalid username or password');
             })
           );
         } else {    // the user cancelled the login dialog
