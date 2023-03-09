@@ -3,7 +3,6 @@ import {
   formatISOWithOptions,
   eachDayOfInterval,
   differenceInCalendarDays,
-  format,
 } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 import { getTimezoneOffset } from 'date-fns-tz';
 import {
@@ -117,7 +116,7 @@ export function getTimetableFlight(
   const flightNumberFromString = Number(flightNumber.substring(2));
   if (!Number.isNaN(flightNumberFromString)) {
     const baseFlightNumber =
-      flightNumberFromString - (flightNumberFromString % 20);
+      flightNumberFromString - (flightNumberFromString % 10);
 
     const route = schedule.routes.find(
       (r) => r.flightNumberBlock === baseFlightNumber,
@@ -143,10 +142,7 @@ export function getTimetableFlight(
         }
       } else {
         throw new Error(
-          `Could not find timetable flight for ${flightNumber} on ${format(
-            'P pppp',
-            dateOfFlight,
-          )}`,
+          `Could not find timetable flight for ${flightNumber} on ${dateOfFlight}`,
         );
       }
     } else {
