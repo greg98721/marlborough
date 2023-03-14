@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { Observable, map } from 'rxjs';
 import { eachDayOfInterval, formatISOWithOptions, parseISO, addDays, differenceInCalendarDays, isBefore, isSameDay, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
-import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone, EMPTY_FLIGHT } from '@marlborough/model';
+import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone, EMPTY_FLIGHT, seatsAvailable, minPrice } from '@marlborough/model';
 import { MinutePipe } from '../../pipes/minute.pipe';
 import { CityNamePipe } from 'src/app/pipes/city-name.pipe';
 
@@ -61,4 +61,17 @@ export class FlightsPageComponent {
     dateFormat(d: Date): string {
       return formatISOWithOptions({representation: 'date'}, d);
     }
+
+    _seatsAvailable(flight: Flight): boolean {
+      return seatsAvailable(flight);
+    }
+
+    _minPrice(flight: Flight): number {
+      return minPrice(flight);
+    }
+
+    numberOfCheapestSeats(flight: Flight): number {
+      return flight.emptyDiscountSeats > 0 ? flight.emptyDiscountSeats : flight.emptyFullPriceSeats;
+    }
+
 }

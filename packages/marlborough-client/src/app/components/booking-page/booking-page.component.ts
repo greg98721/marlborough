@@ -31,7 +31,7 @@ export class BookingPageComponent {
   ticketNumberChoice$: Observable<number[]> = this._route.data.pipe(
     map(t0 => {
       const t = t0['flight'] as { timetableFlight: TimetableFlight, flight: Flight }
-      const maxSeats = t.flight.emptySeats > 10 ? 10 : t.flight.emptySeats;
+      const maxSeats = t.flight.emptyFullPriceSeats > 10 ? 10 : t.flight.emptyFullPriceSeats;
       return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].slice(0, maxSeats);
     }));
 

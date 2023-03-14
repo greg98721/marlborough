@@ -573,52 +573,91 @@ function createFlights(
 
   const createEmptySeatsAndPrice = (dayOfFlight: Date) => {
     const daysTillFlight = differenceInCalendarDays(start, dayOfFlight);
-    // TODO calculate number of seats booked - depends on how soon is the flight - size of flight and rush hour
-    // use a sin curve for bookings over the 6 weeks before the flight
-    let bookedPercent: number;
-    // adjust relative to time of day
+    let fullBookedPercent: number;
+    let percentDiscountSeats: number;
+
+    // add a weighting for rush hour
     const hours = Math.floor(timetableFlight.departs / 60);
-    switch (hours ?? 0) {
-      case 7:
-      case 8:
-      case 16:
-      case 17:
-        bookedPercent = rnd.flat(0.85, 1.3); // greater than 100% as to emulate booked out long way ahead
-        break;
-      case 6:
-      case 9:
-      case 15:
-      case 18:
-      case 19:
-        bookedPercent = rnd.flat(0.7, 1.05);
-        break;
-      default:
-        bookedPercent = rnd.flat(0.4, 0.75);
-        break;
-    }
-    if (daysTillFlight > maximumBookingDay) {
-      bookedPercent = 0;
-    } else if (daysTillFlight > 0) {
-      bookedPercent =
-        (bookedPercent * (maximumBookingDay - daysTillFlight)) /
-        maximumBookingDay;
+    if ((timetableFlight.days & WEEKDAYS) !== 0) {
+      // is a weekday
+      switch (hours ?? 0) {
+        case 7:
+        case 8:
+        case 16:
+        case 17:
+          fullBookedPercent = rnd.flat(0.85, 1.3); // greater than 100% as to emulate booked out long way ahead
+          percentDiscountSeats = 0.2; // not many discount seats at rush hour
+          break;
+        case 6:
+        case 9:
+        case 15:
+        case 18:
+        case 19:
+          fullBookedPercent = rnd.flat(0.7, 1.05);
+          percentDiscountSeats = 0.35; // fewer discount seats at shoulder
+          break;
+        default:
+          fullBookedPercent = rnd.flat(0.4, 0.75);
+          percentDiscountSeats = 0.5;
+          break;
+      }
     } else {
-      bookedPercent = bookedPercent > 1.0 ? 1.0 : bookedPercent;
+      // is a weekend
+      if (hours >= 10 && hours <= 17) {
+        fullBookedPercent = rnd.flat(0.6, 1.0); // greater than 100% as to emulate booked out long way ahead
+        percentDiscountSeats = 0.5;
+      } else {
+        fullBookedPercent = rnd.flat(0.3, 0.6); // greater than 100% as to emulate booked out long way ahead
+        percentDiscountSeats = 0.7;
+      }
     }
 
-    let price: number;
-    if (bookedPercent < 0.2) {
-      price = timetableFlight.basePrice * 0.5;
-    } else if (bookedPercent < 0.8) {
-      price = timetableFlight.basePrice * 0.75;
-    } else {
-      price = timetableFlight.basePrice;
+    // put in a slope of bookings so that the seats are not all booked out
+    if (daysTillFlight > maximumBookingDay) {
+      fullBookedPercent = 0;
+    } else if (daysTillFlight > 0) {
+      // full price seats can be booked up to the day before
+      fullBookedPercent =
+        (fullBookedPercent * (maximumBookingDay - daysTillFlight)) /
+        maximumBookingDay;
     }
+    fullBookedPercent = fullBookedPercent > 1.0 ? 1.0 : fullBookedPercent;
+
+    // the discount seats can only be booked one week out
+    let discountBookedPercent: number;
+    if (daysTillFlight > maximumBookingDay) {
+      discountBookedPercent = 0;
+    } else if (daysTillFlight > 7) {
+      // the discount seats can only be booked one week out
+      const discountBookingPeriod = maximumBookingDay - 7;
+      const adjustedDays = daysTillFlight - 7;
+      discountBookedPercent =
+        (fullBookedPercent * (discountBookingPeriod - adjustedDays)) /
+        adjustedDays;
+    } else {
+      discountBookedPercent = 1.0;
+    }
+    discountBookedPercent =
+      discountBookedPercent > 1.0 ? 1.0 : discountBookedPercent;
+
+    const numDiscountSeats =
+      daysTillFlight > 7
+        ? Math.floor(percentDiscountSeats * capacity(timetableFlight.aircraft))
+        : 0;
+    const emptyDiscountSeats = Math.floor(
+      (1 - discountBookedPercent) * numDiscountSeats,
+    );
+    const numFullPriceSeats =
+      capacity(timetableFlight.aircraft) - numDiscountSeats;
+    const emptyFullPriceSeats = Math.floor(
+      (1 - fullBookedPercent) * numFullPriceSeats,
+    );
+
     return {
-      emptySeats: Math.floor(
-        (1 - bookedPercent) * capacity(timetableFlight.aircraft),
-      ),
-      price: price,
+      emptyDiscountSeats: emptyDiscountSeats,
+      emptyFullPriceSeats: emptyFullPriceSeats,
+      fullPrice: timetableFlight.basePrice,
+      discountPrice: timetableFlight.basePrice * 0.5, // allows for some flexibility in the future
     };
   };
 
@@ -633,8 +672,10 @@ function createFlights(
       return {
         flightNumber: timetableFlight.flightNumber,
         date: formatISOWithOptions({ representation: 'date' }, d),
-        emptySeats: e.emptySeats,
-        price: e.price,
+        emptyFullPriceSeats: e.emptyFullPriceSeats,
+        emptyDiscountSeats: e.emptyDiscountSeats,
+        fullPrice: e.fullPrice,
+        discountPrice: e.discountPrice,
         departed: undefined,
         arrived: undefined,
         bookings: [],
