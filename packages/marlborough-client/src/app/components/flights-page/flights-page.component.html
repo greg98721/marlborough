@@ -14,7 +14,7 @@
     </div>
     <div class="flight-block" *ngFor="let f of timetable.flights; let i=index" [ngClass]="{'selected': vm.selected===i}">
       <a *ngIf="timetable.flights[i].flightNumber !== '' && _seatsAvailable(timetable.flights[i])" [routerLink]="['/booking', timetable.timetableFlight.flightNumber, f.date]" class="price">{{_minPrice(timetable.flights[i]) | currency: 'NZD'}}</a>
-      <div *ngIf="timetable.flights[i].flightNumber !== '' && _seatsAvailable(timetable.flights[i])" class="seats-available">{{numberOfCheapestSeats(timetable.flights[i])}} seats</div>
+      <div *ngIf="timetable.flights[i].flightNumber !== '' && _seatsAvailable(timetable.flights[i])" class="seats-available">{{numberOfCheapestSeats(timetable.flights[i])}} seats at this price</div>
       <div *ngIf="timetable.flights[i].flightNumber !== '' && !_seatsAvailable(timetable.flights[i])" class="fully-booked">Fully Booked</div>
     </div>
   </ng-container>
