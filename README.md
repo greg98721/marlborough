@@ -275,3 +275,36 @@ export class DestinationsPageComponent {
     );
 }
 ```
+
+## NgRx
+
+Having looked at this for a while - I think it is more trouble than it is worth. It is a good idea, for example too awkward to integrate with resolvers.
+
+The underlying client data model is a simple class. The NgRx store is a simple class that holds the state of the application and accessed via the store service.
+
+### Store
+
+#### Timetable
+List of destinations in the schedule. This is a simple array of airport codes.
+And the list of scheduled flights for a single destination.
+#### Flight Selection
+A series of choices to select a  outbound flight for a booking and the return flight if required.
+#### Booking
+The details of a booking including the specific outbound and return flights.
+
+### Actions
+#### Timetable
+- Get list of destinations
+- Get list of flights for a destination
+#### Flight Selection
+- Select an origin airport
+- Select a destination airport
+- Select a date
+- Select an outbound flight
+- Select a return date
+- Select a return flight
+#### Booking
+- Create a booking
+- Select a return option for the booking
+- Edit a booking
+- Delete a booking
