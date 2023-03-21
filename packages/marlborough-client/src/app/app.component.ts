@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
-import { LoadingOverlayComponent } from './components/loading-overlay/loading-overlay.component';
-import { LoadingService } from './services/loading.service';
+import { LoadingOverlayComponent } from './common/components/loading-overlay/loading-overlay.component';
+import { LoadingService } from './common/services/loading.service';
 
 @Component({
   standalone: true,

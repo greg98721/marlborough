@@ -6,12 +6,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppComponent } from './app/app.component';
-import { ROUTES } from './app/routing/app.routes';
-import { CustomErrorHandler } from './app/custom-error-handler.service';
-import { GlobalHttpErrorHandler } from './app/global-http-error-handler.interceptor';
-import { FlightService } from './app/services/flight.service';
-import { AppConfigService } from './app/services/app-config.service';
-import { AuthInterceptor } from './app/auth-Interceptor';
+import { ROUTES } from './app/common/routing/app.routes';
+import { CustomErrorHandler } from './app/common/utility/custom-error-handler.service';
+import { GlobalHttpErrorHandler } from './app/common/utility/global-http-error-handler.interceptor';
+import { FlightService } from './app/timetable/services/flight.service';
+import { AppConfigService } from './app/common/services/app-config.service';
+import { AuthInterceptor } from './app/user/utility/auth-Interceptor';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReactiveFormsModule } from '@angular/forms';
 

@@ -1,0 +1,73 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import { Airport, cityName, Flight, isAirport, TimetableFlight } from '@marlborough/model';
+import { Observable, map, catchError } from 'rxjs';
+import { AppConfigService } from '../../common/services/app-config.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FlightService {
+
+  constructor(private _http: HttpClient, private _config: AppConfigService) { }
+
+  getOrigins$(): Observable<Airport[]> {
+    const url = this._config.apiUrl('routes');
+    return this._http.get(url).pipe(
+      map(response => {
+        const rawList = response as string[];
+        if (rawList.every(isAirport)) { // this is mainly to catch the server and client being out of synch in list of airports
+          const sorted = rawList.sort((a, b) => cityName(a).localeCompare(cityName(b)));  // we will want to display this sorted each time
+          return sorted as Airport[];
+        } else {
+          throw new TypeError('Invalid airport in getting list of origins from server');
+        }
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
+    )
+  }
+
+  getTimetable$(origin: Airport): Observable<{ origin: Airport; timetable: TimetableFlight[] }> {
+    const url = this._config.apiUrl(`routes/timetable/${origin}`);
+    return this._http.get(url).pipe(
+      map(response => {
+        const rawList = response as any[];
+        if (rawList.every(t => isAirport(t.route.destination) && isAirport(t.route.origin))) {
+          // this is mainly to catch the server and client being out of synch in list of airports
+          const timetable = rawList as TimetableFlight[];
+          return { origin: origin, timetable: timetable };
+        } else {
+          throw new TypeError(`Invalid airport in getting list of timetables for ${origin} from server`);
+        }
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
+    )
+  }
+
+  getTimetableFlight$(flightNumber: string, dateOfFlight: string): Observable<{ timetableFlight: TimetableFlight, flight: Flight }> {
+    const url = this._config.apiUrl(`flights/toBook/${flightNumber}/${dateOfFlight}`);
+    return this._http.get(url).pipe(
+      map(response => {
+        return response as { timetableFlight: TimetableFlight, flight: Flight };
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
+    )
+  }
+
+  getFlights$(origin: string, destination: string): Observable<{ timetableFlight: TimetableFlight; flights: Flight[] }[]> {
+    const url = this._config.apiUrl(`flights?origin=${origin}&dest=${destination}`);
+    return this._http.get(url).pipe(
+      map(response => {
+        const flights = response as { timetableFlight: TimetableFlight; flights: Flight[] }[];
+        if (flights.every(t => isAirport(t.timetableFlight.route.destination) && isAirport(t.timetableFlight.route.origin))) {
+          // this is mainly to catch the server and client being out of synch in list of airports
+          return flights;
+        } else {
+          throw new TypeError(`Invalid airport in getting list of timetables for ${origin} from server`);
+        }
+      })
+      // we have proper http error handling higher up the stack - for here we can ignore it
+    )
+  }
+}
