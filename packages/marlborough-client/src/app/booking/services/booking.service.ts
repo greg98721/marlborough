@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Flight, Ticket, TimetableFlight } from '@marlborough/model';
-import { addReturnFlight, ClientFlightBooking, ClientOneWayBooking, createOneWayFlight } from '../model/clientBooking';
+import { Airport, Flight, Ticket, TimetableFlight } from '@marlborough/model';
+import { addReturnFlight, ClientFlightBooking, ClientOneWayBooking, createOneWayFlight } from '../model/client-booking';
 import { UserService } from '../../user/services/user.service';
+import { BookingState } from '../model/booking-state';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
+
+  private _currentState: BookingState = { kind: 'start' };
 
   private _currentBooking?: ClientFlightBooking;
 
@@ -38,4 +41,23 @@ export class BookingService {
     }
   }
 
+  startBooking() {
+    this._currentState = { kind: 'start' };
+  }
+
+  selectOrigin(origin: Airport) {
+    if (this._currentState.kind === 'start') {
+      this._currentState = { kind: 'origin', origin: origin };
+    } else {
+      throw new Error('Cannot select origin from this state');
+    }
+  }
+
+  selectDestination(destination: Airport) {
+    if (this._currentState.kind === 'origin') {
+      this._currentState = { kind: 'destination', route: { origin: this._currentState.origin, destination: destination } };
+    } else {
+      throw new Error('Cannot select destination from this state');
+    }
+  }
 }
