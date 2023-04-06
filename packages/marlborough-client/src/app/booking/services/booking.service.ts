@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Airport, Flight, Ticket, TimetableFlight } from '@marlborough/model';
 import { addReturnFlight, ClientFlightBooking, ClientOneWayBooking, createOneWayFlight } from '../model/client-booking';
 import { UserService } from '../../user/services/user.service';
@@ -9,11 +9,9 @@ import { BookingState } from '../model/booking-state';
 })
 export class BookingService {
 
+  private _userService = inject(UserService);
   private _currentState: BookingState = { kind: 'start' };
-
   private _currentBooking?: ClientFlightBooking;
-
-  constructor(private _userService: UserService) {}
 
   addBooking(timetableFlight: TimetableFlight, flight: Flight): ClientFlightBooking {
     if (this._userService.currentUser !== undefined) {

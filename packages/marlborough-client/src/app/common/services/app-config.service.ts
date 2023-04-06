@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
@@ -8,8 +8,7 @@ import { firstValueFrom } from 'rxjs';
 export class AppConfigService {
 
   private _apiUrl?: string = undefined;
-
-  constructor(private _http: HttpClient) { }
+  private _http = inject(HttpClient);
 
   load() {
     // We want to load the config before anything else happens, which is done via an APP_INITIALIZER in

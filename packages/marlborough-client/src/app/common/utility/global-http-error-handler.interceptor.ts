@@ -11,8 +11,6 @@ import { catchError, Observable, retry, throwError, timer, tap, partition, merge
 @Injectable()
 export class GlobalHttpErrorHandler implements HttpInterceptor {
 
-  constructor() {}
-
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     // we don't want to retry 401s so partition them out first and merge them back in later
     const [unauthorized$, other$] = partition(next.handle(request), resp => resp instanceof HttpResponse && resp.status === 401);

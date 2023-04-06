@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon'
@@ -17,7 +17,8 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
   styleUrls: ['./flights-page.component.scss']
 })
 export class FlightsPageComponent {
-  constructor(private _route: ActivatedRoute, private _router: Router) { }
+  private _route = inject(ActivatedRoute);
+  private _router = inject(Router);
 
   vm$: Observable<{ origin: Airport, destination: Airport, flightData: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selected: number, dayRange: Date[] }> =
     this._route.data.pipe(

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
 import { LoadingOverlayComponent } from './common/components/loading-overlay/loading-overlay.component';
@@ -13,10 +13,7 @@ import { LoadingService } from './common/services/loading.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  private _loadingService = inject(LoadingService)
   title = 'Marlborough';
-  isLoading$: Observable<boolean>;
-
-  constructor(private _loadingService: LoadingService) {
-    this.isLoading$ = this._loadingService.isLoading$;
-  }
+  isLoading$ = this._loadingService.isLoading$;
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FlightService } from 'src/app/timetable/services/flight.service';
@@ -15,7 +15,7 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
 })
 
 export class ChooseOriginPageComponent {
-  constructor(private _flightService: FlightService) { }
+  private _flightService = inject(FlightService);
 
   vm$: Observable<Airport[]> = this._flightService.getOrigins$();
 }

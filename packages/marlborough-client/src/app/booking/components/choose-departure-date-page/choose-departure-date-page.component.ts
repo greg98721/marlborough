@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -18,7 +18,8 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
   styleUrls: ['./choose-departure-date-page.component.scss']
 })
 export class ChooseDepartureDatePageComponent {
-  constructor(private _route: ActivatedRoute, private _router: Router) { }
+  private _route = inject(ActivatedRoute);
+  private _router = inject(Router);
 
   vm$: Observable<{ origin: Airport; destination: Airport; earliest: Date; latest: Date }> =
     this._route.paramMap.pipe(

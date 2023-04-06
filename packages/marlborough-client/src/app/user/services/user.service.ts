@@ -14,7 +14,8 @@ export class UserService {
   private _currentUser?: User;
   private _accessToken?: string;
 
-  constructor(private _http: HttpClient, private _config: AppConfigService) {}
+  private _http = inject(HttpClient);
+  private _config = inject(AppConfigService);
 
   login$() : Observable<User | undefined> {
     const dialog = inject(MatDialog);

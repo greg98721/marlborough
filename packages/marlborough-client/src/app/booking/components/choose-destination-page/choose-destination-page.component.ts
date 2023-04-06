@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FlightService } from 'src/app/timetable/services/flight.service';
@@ -15,7 +15,9 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
   styleUrls: ['./choose-destination-page.component.scss']
 })
 export class ChooseDestinationPageComponent {
-  constructor(private _flightService: FlightService, private _route: ActivatedRoute, private _loadingService: LoadingService) { }
+  private _flightService = inject(FlightService);
+  private _route = inject(ActivatedRoute);
+  private _loadingService = inject(LoadingService);
 
   vm$: Observable<{ origin: Airport; destinationList: Airport[] }> =
     this._route.paramMap.pipe(

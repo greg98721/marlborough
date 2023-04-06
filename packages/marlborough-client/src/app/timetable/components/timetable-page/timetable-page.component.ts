@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 
@@ -17,7 +17,7 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
   styleUrls: ['./timetable-page.component.scss']
 })
 export class TimetablePageComponent {
-  constructor(private _route: ActivatedRoute) { }
+  private _route = inject(ActivatedRoute);
 
   origin$: Observable<string> =
     this._route.paramMap.pipe(

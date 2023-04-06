@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
@@ -21,9 +21,10 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
   styleUrls: ['./booking-page.component.scss']
 })
 export class BookingPageComponent {
+  private _route = inject(ActivatedRoute);
+  private _fb = inject(FormBuilder);
   _bookingSelector$ = new BehaviorSubject<number | undefined>(undefined);
   _form = this._fb.array([]);
-  constructor(private _route: ActivatedRoute, private _fb:FormBuilder) {}
 
   get form() { return this._form as FormArray; }
 

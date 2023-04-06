@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { Airport, cityName, Flight, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
@@ -10,7 +10,8 @@ import { AppConfigService } from '../../common/services/app-config.service';
 })
 export class FlightService {
 
-  constructor(private _http: HttpClient, private _config: AppConfigService) { }
+  private _http = inject(HttpClient);
+  private _config = inject(AppConfigService);
 
   getOrigins$(): Observable<Airport[]> {
     const url = this._config.apiUrl('routes');

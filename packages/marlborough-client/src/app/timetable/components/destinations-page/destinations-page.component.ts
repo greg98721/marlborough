@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlightService } from 'src/app/timetable/services/flight.service';
 import { Observable, map } from 'rxjs';
@@ -14,7 +14,7 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
   styleUrls: ['./destinations-page.component.scss']
 })
 export class DestinationsPageComponent {
-  constructor(private _flightService: FlightService) { }
+  private _flightService = inject(FlightService);
 
   vm$: Observable<{ code: Airport; fluff: string }[]> =
     this._flightService.getOrigins$().pipe(

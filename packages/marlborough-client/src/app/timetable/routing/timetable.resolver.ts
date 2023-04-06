@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
 import { Airport, isAirport, TimetableFlight } from "@marlborough/model";
 import { Observable } from "rxjs";
@@ -7,7 +7,9 @@ import { LoadingService } from '../../common/services/loading.service';
 
 @Injectable({ providedIn: 'root' })
 export class TimetableResolver implements Resolve<{ origin: Airport; timetable: TimetableFlight[] }> {
-  constructor(private _flightService: FlightService, private _loadingService: LoadingService) { }
+
+  private _flightService = inject(FlightService);
+  private _loadingService = inject(LoadingService);
 
   resolve(
     route: ActivatedRouteSnapshot,

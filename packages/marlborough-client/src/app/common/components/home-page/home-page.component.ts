@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { timer, map, Observable } from 'rxjs';
 import { LoadingService } from '../../../common/services/loading.service';
@@ -14,7 +14,7 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./home-page.component.scss']
 })
 export class HomePageComponent {
-  constructor(private _flightService: FlightService) { }
+  private _flightService = inject(FlightService);
 
   // when we start grab the images for the destinations page early to let appear instant
   // no need for the loading service as this is intended to be in the background

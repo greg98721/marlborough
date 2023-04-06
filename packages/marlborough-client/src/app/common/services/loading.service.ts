@@ -9,8 +9,6 @@ export class LoadingService {
   private _isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _count = 0;
 
-  constructor() { }
-
   setLoadingWhile$<T>(action$: Observable<T>): Observable<T> {
     return of(null).pipe(
       delay(0), // this gives Angular a chance to get itself in order and avoids the "Expression has changed after it was checked" error
