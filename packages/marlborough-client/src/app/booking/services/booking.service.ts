@@ -1,16 +1,22 @@
 import { Injectable, inject } from '@angular/core';
-import { Airport, Flight, Ticket, TimetableFlight } from '@marlborough/model';
+import { Airport, Flight, Ticket, TimetableFlight, cityName } from '@marlborough/model';
 import { addReturnFlight, ClientFlightBooking, ClientOneWayBooking, createOneWayFlight } from '../model/client-booking';
 import { UserService } from '../../user/services/user.service';
-import { BookingState } from '../model/booking-state';
+import { BookingState, startBooking, backToBookingStart, addOrigin } from '../model/booking-state';
+import { FlightService } from 'src/app/timetable/services/flight.service';
+import { Observable, map } from 'rxjs';
+import { LoadingService } from 'src/app/common/services/loading.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
 
+  private _flightService = inject(FlightService);
+  private _loadingService = inject(LoadingService);
+  private _currentState = startBooking();
+
   private _userService = inject(UserService);
-  private _currentState: BookingState = { kind: 'start' };
   private _currentBooking?: ClientFlightBooking;
 
   addBooking(timetableFlight: TimetableFlight, flight: Flight): ClientFlightBooking {
@@ -30,6 +36,51 @@ export class BookingService {
     }
   }
 
+  startWithOriginSelection(): Observable<Airport[]> {
+    this._currentState = startBooking();
+    return this._flightService.getOrigins$();
+  }
+
+  selectOrigin(origin: Airport) {
+    this._currentState = addOrigin(this._currentState, origin);
+  }
+
+  startWithDestinationSelection(origin: Airport): Observable<{ origin: Airport; destinationList: Airport[] }> {
+    // could have jumped straight to this page from timetable pages
+    const initial = startBooking();
+    this._currentState = addOrigin(initial, origin);
+  }
+
+  getDestinations$(): Observable<{ origin: Airport; destinationList: Airport[] }> {
+    return this._loadingService.setLoadingWhile$(this._flightService.getTimetable$(origin as Airport)).pipe(
+      map(data => {
+        if (data.timetable.length > 0) {
+          // get the unique destinations
+          const a = data.timetable.map(t => t.route.destination);
+          const unique = [...new Set(a)];
+          const sorted = unique.sort((a, b) => cityName(a).localeCompare(cityName(b)));
+          return {
+            origin: data.origin,
+            destinationList: sorted
+          };
+        } else {
+          throw Error('Should never get here as we have checked we had an origin parameter')
+        }
+      })
+    );
+  }
+
+
+  allOrigins$(): Observable<Airport[]> {
+    return this._flightService.getOrigins$();
+  }
+
+  validDestinations$(): Observable<Airport[]> {
+    if (this._currentState.kind === 'selectingOrigin') {
+      return this._flightService.getDestinations$(this._currentState.origin);
+    }
+  }
+
   completePurchase() {
     if (this._currentBooking !== undefined) {
       // TODO call API to save purchase
@@ -40,22 +91,13 @@ export class BookingService {
   }
 
   startBooking() {
-    this._currentState = { kind: 'start' };
+    this._currentState = backToBookingStart(this._currentState);
   }
 
-  selectOrigin(origin: Airport) {
-    if (this._currentState.kind === 'start') {
-      this._currentState = { kind: 'origin', origin: origin };
-    } else {
-      throw new Error('Cannot select origin from this state');
-    }
+  _selectOrigin(origin: Airport) {
+    this._currentState = addOrigin(this._currentState, origin);
   }
 
   selectDestination(destination: Airport) {
-    if (this._currentState.kind === 'origin') {
-      this._currentState = { kind: 'destination', route: { origin: this._currentState.origin, destination: destination } };
-    } else {
-      throw new Error('Cannot select destination from this state');
-    }
   }
 }

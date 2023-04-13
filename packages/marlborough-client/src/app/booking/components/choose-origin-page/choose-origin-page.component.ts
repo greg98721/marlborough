@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FlightService } from 'src/app/timetable/services/flight.service';
+import { RouterModule, Router } from '@angular/router';
 import { Airport } from '@marlborough/model';
 import { Observable, map } from 'rxjs';
 import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
+import { BookingService } from '../../services/booking.service';
 
 @Component({
   selector: 'app-choose-origin-page',
@@ -15,7 +15,13 @@ import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
 })
 
 export class ChooseOriginPageComponent {
-  private _flightService = inject(FlightService);
+  private _bookingService = inject(BookingService);
+  private _router = inject(Router);
 
-  vm$: Observable<Airport[]> = this._flightService.getOrigins$();
+  vm$: Observable<Airport[]> = this._bookingService.allOrigins$();
+
+  originSelected(origin: Airport) {
+    this._bookingService.selectOrigin(origin);
+    this._router.navigate(['/choose/destination']);
+  }
 }

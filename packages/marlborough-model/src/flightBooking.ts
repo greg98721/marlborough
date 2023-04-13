@@ -23,10 +23,9 @@ export interface ReturnBooking {
   kind: 'return';
   outboundDate: string;
   outboundFlightNumber: string;
-  outboundTickets: Ticket[];
   inboundDate: string;
   inboundFlightNumber: string;
-  inboundTickets: Ticket[];
+  tickets: Ticket[];
 }
 
 export type FlightBooking = OneWayBooking | ReturnBooking;

@@ -8,8 +8,8 @@ import { BookingResolver } from './booking.resolver';
 
 
 export const BOOKING_ROUTES: Routes = [
-  { path: 'booking/:flight/:date', component: BookingPageComponent, resolve: { flight: BookingResolver }, canActivate: [isAuthenticated$]},
-  { path: 'choose/:origin/:destination', component: ChooseDepartureDatePageComponent },
-  { path: 'choose/:origin', component: ChooseDestinationPageComponent },
-  { path: 'choose', component: ChooseOriginPageComponent },
+  { path: 'choose/flight', component: BookingPageComponent, resolve: { flight: BookingResolver }, canActivate: [isAuthenticated$]},
+  { path: 'choose/date', component: ChooseDepartureDatePageComponent },
+  { path: 'choose/destination', component: ChooseDestinationPageComponent },
+  { path: 'choose/origin', component: ChooseOriginPageComponent },
 ];
