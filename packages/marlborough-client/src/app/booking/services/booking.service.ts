@@ -14,27 +14,14 @@ export class BookingService {
 
   private _flightService = inject(FlightService);
   private _loadingService = inject(LoadingService);
-  private _currentState = startBooking();
+  private _currentState$ = this._flightService.getOrigins$().pipe(
+    map(origins => {
+      return startBooking(origins);
+    }
+  ));
 
   private _userService = inject(UserService);
   private _currentBooking?: ClientFlightBooking;
-
-  addBooking(timetableFlight: TimetableFlight, flight: Flight): ClientFlightBooking {
-    if (this._userService.currentUser !== undefined) {
-      if (this._currentBooking === undefined) { // if there is not an existing booking
-        this._currentBooking = createOneWayFlight(flight, timetableFlight, this._userService.currentUser.fullname);
-        return this._currentBooking;
-      } else if (this._currentBooking.kind === 'oneWay') { // if there is an existing booking and it is a one-way booking
-        const returnBooking = addReturnFlight(this._currentBooking, flight, timetableFlight);
-        this._currentBooking = returnBooking;
-        return returnBooking;
-      } else { // this._currentBooking.kind === 'return'
-        throw new Error('Cannot add a booking to a return booking');
-      }
-    } else {
-      throw new Error('You must be logged in to start a purchase');
-    }
-  }
 
   startWithOriginSelection(): Observable<Airport[]> {
     this._currentState = startBooking();
@@ -100,4 +87,22 @@ export class BookingService {
 
   selectDestination(destination: Airport) {
   }
+  addBooking(timetableFlight: TimetableFlight, flight: Flight): ClientFlightBooking {
+    if (this._userService.currentUser !== undefined) {
+      if (this._currentBooking === undefined) { // if there is not an existing booking
+        this._currentBooking = createOneWayFlight(flight, timetableFlight, this._userService.currentUser.fullname);
+        return this._currentBooking;
+      } else if (this._currentBooking.kind === 'oneWay') { // if there is an existing booking and it is a one-way booking
+        const returnBooking = addReturnFlight(this._currentBooking, flight, timetableFlight);
+        this._currentBooking = returnBooking;
+        return returnBooking;
+      } else { // this._currentBooking.kind === 'return'
+        throw new Error('Cannot add a booking to a return booking');
+      }
+    } else {
+      throw new Error('You must be logged in to start a purchase');
+    }
+  }
+
+
 }

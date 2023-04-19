@@ -1,39 +1,58 @@
-import { Airport, AirRoute, Flight, FlightBooking, Ticket, TimetableFlight } from "@marlborough/model";
+import { Airport, AirRoute, EMPTY_FLIGHT, Flight, FlightBooking, maximumBookingDay, startOfDayInTimezone, Ticket, TimetableFlight, timezone } from "@marlborough/model";
+import { addDays, parseISO, differenceInCalendarDays, eachDayOfInterval, isSameDay } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
-interface BookingStart {
+export interface BookingStart {
   kind: 'start',
+  origins: Airport[]
 }
 
-interface BookingOrigin {
+export interface BookingOrigin {
   kind: 'origin',
   origin: Airport
+  destinationRoutes: AirRoute[]
 }
 
-interface BookingDestination {
+export interface BookingDestination {
   kind: 'destination',
   route: AirRoute,
+  earliest: Date,
+  latest: Date
 }
 
-interface NominalBookingDate {
+export interface NominalBookingDate {
   kind: 'nominal_date',
   route: AirRoute,
-  nominalDate: string
+  dayRange: Date[],
+  nominalDate: number,
+  timetableFlights: { timetableFlight: TimetableFlight, flights: Flight[] }[]
 }
 
-interface OneWayBookingSelected {
+export interface OneWayBookingSelected {
   kind: 'one_way_selected',
   outboundTimetableFlight: TimetableFlight,
   outboundFlight: Flight
 }
 
-interface NominalBookingReturnDate {
+export interface ReturnFlightRequested {
+  kind: 'return_flight_requested',
+  outboundTimetableFlight: TimetableFlight,
+  outboundFlight: Flight,
+  returnRoute: AirRoute,
+  earliest: Date,
+  latest: Date
+}
+
+export interface NominalBookingReturnDate {
   kind: 'nominal_return_date',
   outboundTimetableFlight: TimetableFlight,
   outboundFlight: Flight,
-  nominalReturnDate: string
+  returnRoute: AirRoute,
+  dayRange: Date[],
+  nominalReturnDate: number
+  timetableReturnFlights: { timetableFlight: TimetableFlight, flights: Flight[] }[]
 }
 
-interface ReturnBookingSelected {
+export interface ReturnBookingSelected {
   kind: 'return_selected',
   outboundTimetableFlight: TimetableFlight,
   outboundFlight: Flight,
@@ -41,15 +60,16 @@ interface ReturnBookingSelected {
   inboundFlight: Flight
 }
 
-export type BookingState = BookingStart | BookingOrigin | BookingDestination | NominalBookingDate | OneWayBookingSelected | NominalBookingReturnDate | ReturnBookingSelected;
+/** Defines the state machine in the booking service togeather with all data required at each state */
+export type BookingState = BookingStart | BookingOrigin | BookingDestination | NominalBookingDate | OneWayBookingSelected | ReturnFlightRequested | NominalBookingReturnDate | ReturnBookingSelected;
 
-export function startBooking(): BookingState {
-  return { kind: 'start' };
+export function startBooking(origins: Airport[]): BookingState {
+  return { kind: 'start', origins };
 }
 
-export function addOrigin(state: BookingState, origin: Airport): BookingState {
+export function addOrigin(state: BookingState, origin: Airport, destinationRoutes: AirRoute[]): BookingState {
   if (state.kind === 'start') {
-    return { kind: 'origin', origin: origin };
+    return { kind: 'origin', origin, destinationRoutes };
   } else {
     throw new Error(`Cannot create origin state from ${state.kind}`);
   }
@@ -58,7 +78,13 @@ export function addOrigin(state: BookingState, origin: Airport): BookingState {
 export function addDestination(state: BookingState, route: AirRoute): BookingState {
   if (state.kind === 'origin') {
     if (route.origin === state.origin) {
-      return { kind: 'destination', route: route };
+      const originTimeZone = timezone(state.origin);
+      // the local date of the user does not count - only the current time at the origin
+      // we want starting tomorrow as too hard to determine what remains of today
+      const earliest = addDays(1, startOfDayInTimezone(originTimeZone, new Date()));
+      const latest = addDays(maximumBookingDay, earliest);
+
+      return { kind: 'destination', route: route, earliest, latest };
     } else {
       throw new Error(`State origin ${state.origin} does not match route origin ${route.origin}`);
     }
@@ -67,29 +93,131 @@ export function addDestination(state: BookingState, route: AirRoute): BookingSta
   }
 }
 
-export function addDate(state: BookingState, date: string): BookingState {
+export function addDate(state: BookingState, nominalDate: string, timetableFlights: { timetableFlight: TimetableFlight, flights: Flight[] }[]): BookingState {
   if (state.kind === 'destination') {
-    return { kind: 'nominal_date', route: state.route, nominalDate: date };
+    const originTimeZone = timezone(state.route.origin);
+    const sel = parseISO(nominalDate);
+    const selected = startOfDayInTimezone(originTimeZone, sel);
+    const earliest = addDays(1, startOfDayInTimezone(originTimeZone, new Date()));
+
+    // we want a five day selection around the selected date taking into account where the selected date is near one end of the possible range
+    const gap = differenceInCalendarDays(earliest, selected);
+    let dayRange: Date[];
+    let selIndex: number;
+    if (gap < 3) {
+      dayRange = eachDayOfInterval({ start: earliest, end: addDays(4, earliest) })
+      selIndex = gap;
+    } else if (gap > (maximumBookingDay - 2)) {
+      dayRange = eachDayOfInterval({ start: addDays(maximumBookingDay - 4, earliest), end: addDays(maximumBookingDay, earliest) })
+      selIndex = gap - maximumBookingDay + 4;
+    } else {
+      dayRange = eachDayOfInterval({ start: addDays(-2, selected), end: addDays(+2, selected) })
+      selIndex = 2;
+    }
+
+    if (dayRange.length !== 5) {
+      throw new Error(`Did not create valid day range - length = ${dayRange.length}`);
+    }
+
+    const withinRange = timetableFlights.map(f => {
+      const parsed = f.flights.map(p => ({ date: parseISO(p.date), flight: p }));
+      const filtered = dayRange.map(d => parsed.find(p => isSameDay(p.date, d))?.flight ?? EMPTY_FLIGHT);
+      return { timetableFlight: f.timetableFlight, flights: filtered };
+    });
+    const filtered = withinRange.filter(f => f.flights.filter(l => l.flightNumber !== '').length > 0);
+    const sorted = filtered.sort((a, b) => (a.timetableFlight.departs - b.timetableFlight.departs));
+    return { kind: 'nominal_date', route: state.route, dayRange, nominalDate: selIndex, timetableFlights: sorted };
   } else {
-    throw new Error(`Cannot create date state from ${state.kind}`);
+    throw new Error(`Cannot create nominal_date state from ${state.kind}`);
   }
 }
 
 export function selectOneWayBooking(state: BookingState, outboundTimetableFlight: TimetableFlight, outboundFlight: Flight): BookingState {
   if (state.kind === 'nominal_date') {
     if (state.route.origin === outboundTimetableFlight.route.origin && state.route.destination === outboundTimetableFlight.route.destination) {
-      return { kind: 'one_way_selected', outboundTimetableFlight: outboundTimetableFlight, outboundFlight: outboundFlight };
+      return { kind: 'one_way_selected', outboundTimetableFlight, outboundFlight };
     } else {
       throw new Error(`State route ${state.route.origin} -> ${state.route.destination} does not match outbound timetable flight route ${outboundTimetableFlight.route.origin} -> ${outboundTimetableFlight.route.destination}`);
     }
   } else {
-    throw new Error(`Cannot create oneway booking state from ${state.kind}`);
+    throw new Error(`Cannot create one_way_selected booking state from ${state.kind}`);
   }
 }
 
-export function addReturnDate(state: BookingState, returnDate: string): BookingState {
+export function requestReturnFlight(state: BookingState, returnRoute: AirRoute): BookingState {
   if (state.kind === 'one_way_selected') {
-    return { kind: 'nominal_return_date', outboundTimetableFlight: state.outboundTimetableFlight, outboundFlight: state.outboundFlight, nominalReturnDate: returnDate };
+    // As far as the demo goes there will always be a return route - but in reality there may not be
+    if (state.outboundTimetableFlight.route.origin === returnRoute.destination && state.outboundTimetableFlight.route.destination === returnRoute.origin) {
+
+      const destinationTimeZone = timezone(state.outboundTimetableFlight.route.destination);
+
+      // the local date of the user does not count - only the current time at the origin
+      // we want starting tomorrow as too hard to determine what remains of today
+      const tomorrow = addDays(1, startOfDayInTimezone(destinationTimeZone, new Date()));
+      const dateOfOutboundFlight = parseISO(state.outboundFlight.date);
+      const earliest = addDays(1, dateOfOutboundFlight);
+      const latest = addDays(maximumBookingDay, tomorrow);
+
+      return { kind: 'return_flight_requested', outboundTimetableFlight: state.outboundTimetableFlight, outboundFlight: state.outboundFlight, returnRoute, earliest, latest };
+    } else {
+      throw new Error(`Return route ${returnRoute.origin} -> ${returnRoute.destination} does not reverse outbound timetable flight route ${state.outboundTimetableFlight.route.origin} -> ${state.outboundTimetableFlight.route.destination}`);
+    }
+  } else {
+    throw new Error(`Cannot create return_flight_requested booking state from ${state.kind}`);
+  }
+}
+
+export function addReturnDate(state: BookingState, nominalReturnDate: string, timetableReturnFlights: { timetableFlight: TimetableFlight, flights: Flight[] }[]): BookingState {
+  if (state.kind === 'return_flight_requested') {
+    const destinationTimeZone = timezone(state.returnRoute.origin);
+    const sel = parseISO(nominalReturnDate);
+    const selected = startOfDayInTimezone(destinationTimeZone, sel);
+    const tomorrow = addDays(1, startOfDayInTimezone(destinationTimeZone, new Date()));
+    const dateOfOutboundFlight = parseISO(state.outboundFlight.date);
+    const earliest = addDays(1, dateOfOutboundFlight);
+    const latest = addDays(maximumBookingDay, tomorrow);
+
+    // we want up to a five day selection around the selected date taking into account where the selected date is near one end of the possible range
+    const totalGap = differenceInCalendarDays(earliest, latest);
+    const earlyGap = differenceInCalendarDays(earliest, selected);
+    const lateGap = differenceInCalendarDays(selected, latest);
+    let dayRange: Date[];
+    let selIndex: number;
+    if (totalGap < 5) {
+      dayRange = eachDayOfInterval({ start: earliest, end: latest })
+      selIndex = earlyGap;
+    } else if (earlyGap < 3) {
+      dayRange = eachDayOfInterval({ start: earliest, end: addDays(4, earliest) })
+      selIndex = earlyGap;
+    } else if (lateGap < 3) {
+      dayRange = eachDayOfInterval({ start: addDays(-4, latest), end: latest })
+      selIndex = 4 - lateGap;
+    } else {
+      dayRange = eachDayOfInterval({ start: addDays(-2, selected), end: addDays(+2, selected) })
+      selIndex = 2;
+    }
+
+    if (dayRange.length !== 5) {
+      throw new Error(`Did not create valid day range - length = ${dayRange.length}`);
+    }
+
+    const withinRange = timetableReturnFlights.map(f => {
+      const parsed = f.flights.map(p => ({ date: parseISO(p.date), flight: p }));
+      const filtered = dayRange.map(d => parsed.find(p => isSameDay(p.date, d))?.flight ?? EMPTY_FLIGHT);
+      return { timetableFlight: f.timetableFlight, flights: filtered };
+    });
+    const filtered = withinRange.filter(f => f.flights.filter(l => l.flightNumber !== '').length > 0);
+    const sorted = filtered.sort((a, b) => (a.timetableFlight.departs - b.timetableFlight.departs));
+
+    return {
+      kind: 'nominal_return_date',
+      outboundTimetableFlight: state.outboundTimetableFlight,
+      outboundFlight: state.outboundFlight,
+      returnRoute: state.returnRoute,
+      dayRange,
+      nominalReturnDate: selIndex,
+      timetableReturnFlights: sorted
+    };
   } else {
     throw new Error(`Cannot create return date state from ${state.kind}`);
   }
@@ -104,84 +232,5 @@ export function selectReturnBooking(state: BookingState, inboundTimetableFlight:
     }
   } else {
     throw new Error(`Cannot create return selected state from ${state.kind}`);
-  }
-}
-
-// A set of functions to allow us to go backwards in the state
-export function backToBookingStart(state: BookingState): BookingStart {
-  if (state.kind !== 'start') {
-    return { kind: 'start' };
-  } else {
-    throw new Error(`Cannot select start state from start`);
-  }
-}
-
-export function backToBookingOrigin(state: BookingState): BookingOrigin {
-  switch (state.kind) {
-    case 'destination':
-    case 'nominal_date':
-      return { kind: 'origin', origin: state.route.origin };
-    case 'one_way_selected':
-    case 'nominal_return_date':
-    case 'return_selected':
-      return { kind: 'origin', origin: state.outboundTimetableFlight.route.origin };
-    default:
-      throw new Error(`Cannot select origin state from ${state.kind}`);
-  }
-}
-
-export function backToBookingDestination(state: BookingState): BookingDestination {
-  switch (state.kind) {
-    case 'nominal_date':
-      return { kind: 'destination', route: state.route };
-    case 'one_way_selected':
-    case 'nominal_return_date':
-    case 'return_selected':
-      return { kind: 'destination', route: state.outboundTimetableFlight.route };
-    default:
-      throw new Error(`Cannot select destination state from ${state.kind}`);
-  }
-}
-
-export function backToBookingDate(state: BookingState): NominalBookingDate {
-  switch (state.kind) {
-    case 'one_way_selected':
-    case 'nominal_return_date':
-    case 'return_selected':
-      return { kind: 'nominal_date', route: state.outboundTimetableFlight.route, nominalDate: state.outboundFlight.date };
-    default:
-      throw new Error(`Cannot select date state from ${state.kind}`);
-  }
-}
-
-export function backToBookingReturnDate(state: BookingState): NominalBookingReturnDate {
-  switch (state.kind) {
-    case 'return_selected':
-      return { kind: 'nominal_return_date', outboundTimetableFlight: state.outboundTimetableFlight, outboundFlight: state.outboundFlight, nominalReturnDate: state.inboundFlight.date };
-    default:
-      throw new Error(`Cannot select booking return state from ${state.kind}`);
-  }
-}
-
-export function createBooking(state: BookingState, tickets: Ticket[]): FlightBooking {
-  switch (state.kind) {
-    case 'one_way_selected':
-      return {
-        kind: 'oneWay',
-        date: state.outboundFlight.date,
-        flightNumber: state.outboundFlight.flightNumber,
-        tickets: tickets
-      };
-    case 'return_selected':
-      return {
-        kind: 'return',
-        outboundDate: state.outboundFlight.date,
-        outboundFlightNumber: state.outboundFlight.flightNumber,
-        inboundDate: state.inboundFlight.date,
-        inboundFlightNumber: state.inboundFlight.flightNumber,
-        tickets: tickets
-      }
-    default:
-      throw new Error(`Cannot create booking from ${state.kind}`);
   }
 }

@@ -1,0 +1,6 @@
+<div *ngIf="vm !== undefined" class="layout">
+  <div class="origin-question">Taking off from?</div>
+  <div class="origin-list">
+    <a *ngFor="let origin of vm.origins" (click)="originSelected(origin)">{{ origin | cityName }}</a>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div *ngIf="vm" class="layout">
+  <div class="top-left"></div>
+  <div class="headline">Flights from {{vm.route.origin | cityName}} to {{vm.route.destination | cityName}}</div>
+  <div></div>
+  <div class="date-block" *ngFor="let dr of vm.dayRange; let i=index" [ngClass]="{'selected': vm.nominalDate===i}">
+    <div>{{ vm.dayRange[i] | date:'cccc' }}</div>
+    <div>{{ vm.dayRange[i] | date:'d LLLL' }}</div>
+  </div>
+  <ng-container *ngFor="let timetable of vm.timetableFlights">
+    <div class="timetable-block">
+      <div class="flight-number">{{timetable.timetableFlight.flightNumber}}</div>
+      <div class="departs"><mat-icon>flight_takeoff</mat-icon><span class="cdk-visually-hidden">Departs</span>{{timetable.timetableFlight.departs | minute }}</div>
+      <div class="arrives"><mat-icon>flight_land</mat-icon><span class="cdk-visually-hidden">Arrives</span>{{timetable.timetableFlight.arrives | minute }}</div>
+    </div>
+    <div class="flight-block" *ngFor="let f of timetable.flights; let i=index" [ngClass]="{'selected': vm.nominalDate===i}">
+      <a *ngIf="timetable.flights[i].flightNumber !== '' && _seatsAvailable(timetable.flights[i])" (click)="flightSelected(timetable.flights[i])" class="price">{{_minPrice(timetable.flights[i]) | currency: 'NZD'}}</a>
+      <div *ngIf="timetable.flights[i].flightNumber !== '' && _seatsAvailable(timetable.flights[i])" class="seats-available">{{numberOfCheapestSeats(timetable.flights[i])}} seats at this price</div>
+      <div *ngIf="timetable.flights[i].flightNumber !== '' && !_seatsAvailable(timetable.flights[i])" class="fully-booked">Fully Booked</div>
+    </div>
+  </ng-container>
+</div>

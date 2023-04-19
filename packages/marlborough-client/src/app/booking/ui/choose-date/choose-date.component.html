@@ -1,0 +1,8 @@
+<div *ngIf="vm" class="layout">
+  <div class="origin-summary">Taking off from {{vm.route.origin | cityName}}</div>
+  <div class="destination-summary">Flying to {{vm.route.destination | cityName}}</div>
+  <div class="date-question">Date of flight?</div>
+  <mat-calendar [minDate]="vm.earliest" [maxDate]="vm.latest"
+    (selectedChange)="dateSelected($event)" color="accent"
+    class="date-picker"></mat-calendar>
+</div>

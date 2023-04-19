@@ -1,0 +1,7 @@
+<div *ngIf="vm !== undefined" class="layout">
+  <div class="origin-summary">Taking off from {{vm.origin | cityName}}</div>
+  <div class="question">Flying to?</div>
+  <div class="destination-list">
+    <a *ngFor="let route of vm.destinations" (click)="destinationSelected(route)">{{ route.destination | cityName }}</a>
+  </div>
+</div>
