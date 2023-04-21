@@ -1,7 +1,7 @@
 <div class="layout">
   <div class="headline">Marlborough Air</div>
   <a [routerLink]="['/destinations']" class="timetable-link">Where We Fly</a>
-  <a [routerLink]="['/choose']" class="booking-link">Book A Flight</a>
+  <a [routerLink]="['/booking']" class="booking-link">Book A Flight</a>
 </div>
 <!-- We want to preload the images for the destinations page to make it appear instantly -->
 <img *ngFor="let origin of vm$ | async"

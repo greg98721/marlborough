@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { map, Observable, switchMap, of, tap, catchError } from 'rxjs';
 import { User } from '@marlborough/model';
 import { LoginDialogComponent } from '../components/login-dialog/login-dialog.component';
-import { AppConfigService } from '../../common/services/app-config.service';
+import { AppConfigService } from 'src/app/common/services/app-config.service';
 
 @Injectable({
   providedIn: 'root'

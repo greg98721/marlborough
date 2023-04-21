@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { timer, map, Observable } from 'rxjs';
-import { LoadingService } from '../../../common/services/loading.service';
+import { LoadingService } from 'src/app/common/services/loading.service';
 import { FlightService } from 'src/app/timetable/services/flight.service';
 import { Airport } from '@marlborough/model';
 import { RouterModule } from '@angular/router';

@@ -1,1 +1,36 @@
-<p>finalise works!</p>
+<div *ngIf="vm" class="layout">
+  <div *ngIf="vm.kind === 'one_way_booking'" class="summary">
+    <div>Flight {{vm.outboundFlight.flightNumber}}</div>
+    <div>{{ createDepartureDate(vm.outboundFlight) | date:'cccc LLLL d' }}</div>
+    <div>
+      Departs {{ vm.outboundTimetableFlight.route.origin | cityName}} at {{ vm.outboundTimetableFlight.departs | minute }}
+    </div>
+    <div>
+      Arrives {{ vm.outboundTimetableFlight.route.destination | cityName}} at {{ vm.outboundTimetableFlight.arrives | minute }}
+    </div>
+  </div>
+  <div *ngIf="vm.kind === 'return_booking'" class="summary">
+    <div>Outbound Flight {{vm.outboundFlight.flightNumber}}</div>
+    <div>{{ createDepartureDate(vm.outboundFlight) | date:'cccc LLLL d' }}</div>
+    <div>
+      Departs {{ vm.outboundTimetableFlight.route.origin | cityName}} at {{ vm.outboundTimetableFlight.departs | minute }}
+    </div>
+    <div>
+      Arrives {{ vm.outboundTimetableFlight.route.destination | cityName}} at {{ vm.outboundTimetableFlight.arrives | minute }}
+    </div>
+    <div>Return Flight {{vm.inboundFlight.flightNumber}}</div>
+    <div>{{ createDepartureDate(vm.inboundFlight) | date:'cccc LLLL d' }}</div>
+    <div>
+      Departs {{ vm.inboundTimetableFlight.route.origin | cityName}} at {{ vm.inboundTimetableFlight.departs | minute }}
+    </div>
+    <div>
+      Arrives {{ vm.inboundTimetableFlight.route.destination | cityName}} at {{ vm.inboundTimetableFlight.arrives | minute }}
+    </div>
+  </div>
+  <div class="booking">
+    Number of Tickets
+    <mat-button-toggle-group name="fontStyle" aria-label="Number of tickets">
+      <mat-button-toggle *ngFor="let i of availableSeats" value="i">{{ i }}</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+</div>

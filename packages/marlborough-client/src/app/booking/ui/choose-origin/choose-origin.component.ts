@@ -1,6 +1,6 @@
 import { Component, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookingStart, BookingState } from '../../model/booking-state';
+import { BookingStart, BookingState } from 'src/app/booking/feature/make-booking/booking-state';
 import { Airport } from '@marlborough/model';
 import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
 

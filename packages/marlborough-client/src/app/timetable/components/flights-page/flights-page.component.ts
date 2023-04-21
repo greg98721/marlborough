@@ -6,7 +6,7 @@ import { Observable, map } from 'rxjs';
 import { eachDayOfInterval, formatISOWithOptions, parseISO, addDays, differenceInCalendarDays, isBefore, isSameDay, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone, EMPTY_FLIGHT, seatsAvailable, minPrice } from '@marlborough/model';
-import { MinutePipe } from '../../../common/pipes/minute.pipe';
+import { MinutePipe } from 'src/app/common/pipes/minute.pipe';
 import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
 
 @Component({

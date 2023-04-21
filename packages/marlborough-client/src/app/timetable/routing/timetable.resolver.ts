@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/r
 import { Airport, isAirport, TimetableFlight } from "@marlborough/model";
 import { Observable } from "rxjs";
 import { FlightService } from "../services/flight.service";
-import { LoadingService } from '../../common/services/loading.service';
+import { LoadingService } from 'src/app/common/services/loading.service';
 
 @Injectable({ providedIn: 'root' })
 export class TimetableResolver implements Resolve<{ origin: Airport; timetable: TimetableFlight[] }> {

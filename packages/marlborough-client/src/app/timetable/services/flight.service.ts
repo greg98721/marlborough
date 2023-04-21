@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
-import { Airport, cityName, Flight, isAirport, TimetableFlight } from '@marlborough/model';
+import { Airport, AirRoute, cityName, Flight, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
-import { AppConfigService } from '../../common/services/app-config.service';
+import { AppConfigService } from 'src/app/common/services/app-config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +44,22 @@ export class FlightService {
       })
       // we have proper http error handling higher up the stack - for here we can ignore it
     )
+  }
+
+  /** From all the timetables select the unique list of destinations */
+  getDestinations$(origin: Airport): Observable<AirRoute[]> {
+    return this.getTimetable$(origin).pipe(
+      map(data => {
+        if (data.timetable.length > 0) {
+          // get the unique destinations
+          const a = data.timetable.map(t => t.route);
+          const unique = [...new Set(a)];
+          return unique.sort((a, b) => cityName(a.destination).localeCompare(cityName(b.destination)));
+        } else {
+          throw Error('Should never get here as we have checked we had an origin for _getDestinations')
+        }
+      })
+    );
   }
 
   getTimetableFlight$(flightNumber: string, dateOfFlight: string): Observable<{ timetableFlight: TimetableFlight, flight: Flight }> {

@@ -1,7 +1,7 @@
 import { Component, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon'
-import { BookingState, NominalBookingDate } from '../../model/booking-state';
+import { BookingState, NominalBookingDate } from 'src/app/booking/feature/make-booking/booking-state';
 import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
 import { MinutePipe } from 'src/app/common/pipes/minute.pipe';
 import { AirRoute, Flight, TimetableFlight, minPrice, seatsAvailable } from '@marlborough/model';

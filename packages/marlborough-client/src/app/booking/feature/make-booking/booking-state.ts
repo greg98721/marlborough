@@ -1,6 +1,11 @@
 import { Airport, AirRoute, EMPTY_FLIGHT, Flight, FlightBooking, maximumBookingDay, startOfDayInTimezone, Ticket, TimetableFlight, timezone } from "@marlborough/model";
 import { addDays, parseISO, differenceInCalendarDays, eachDayOfInterval, isSameDay } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
+/** Just so we have something to initialise with */
+export interface UndefinedState {
+  kind: 'undefined'
+}
+
 export interface BookingStart {
   kind: 'start',
   origins: Airport[]
@@ -27,8 +32,14 @@ export interface NominalBookingDate {
   timetableFlights: { timetableFlight: TimetableFlight, flights: Flight[] }[]
 }
 
-export interface OneWayBookingSelected {
-  kind: 'one_way_selected',
+export interface OutboundFlight {
+  kind: 'outbound_flight',
+  outboundTimetableFlight: TimetableFlight,
+  outboundFlight: Flight
+}
+
+export interface DetailsForOneWayBooking {
+  kind: 'one_way_booking',
   outboundTimetableFlight: TimetableFlight,
   outboundFlight: Flight
 }
@@ -52,8 +63,8 @@ export interface NominalBookingReturnDate {
   timetableReturnFlights: { timetableFlight: TimetableFlight, flights: Flight[] }[]
 }
 
-export interface ReturnBookingSelected {
-  kind: 'return_selected',
+export interface DetailsForReturnBooking {
+  kind: 'return_booking',
   outboundTimetableFlight: TimetableFlight,
   outboundFlight: Flight,
   inboundTimetableFlight: TimetableFlight,
@@ -61,7 +72,7 @@ export interface ReturnBookingSelected {
 }
 
 /** Defines the state machine in the booking service togeather with all data required at each state */
-export type BookingState = BookingStart | BookingOrigin | BookingDestination | NominalBookingDate | OneWayBookingSelected | ReturnFlightRequested | NominalBookingReturnDate | ReturnBookingSelected;
+export type BookingState = UndefinedState | BookingStart | BookingOrigin | BookingDestination | NominalBookingDate | OutboundFlight | DetailsForOneWayBooking | ReturnFlightRequested | NominalBookingReturnDate | DetailsForReturnBooking;
 
 export function startBooking(origins: Airport[]): BookingState {
   return { kind: 'start', origins };
@@ -132,20 +143,28 @@ export function addDate(state: BookingState, nominalDate: string, timetableFligh
   }
 }
 
-export function selectOneWayBooking(state: BookingState, outboundTimetableFlight: TimetableFlight, outboundFlight: Flight): BookingState {
+export function selectOutboundFlight(state: BookingState, outboundTimetableFlight: TimetableFlight, outboundFlight: Flight): BookingState {
   if (state.kind === 'nominal_date') {
     if (state.route.origin === outboundTimetableFlight.route.origin && state.route.destination === outboundTimetableFlight.route.destination) {
-      return { kind: 'one_way_selected', outboundTimetableFlight, outboundFlight };
+      return { kind: 'outbound_flight', outboundTimetableFlight, outboundFlight };
     } else {
       throw new Error(`State route ${state.route.origin} -> ${state.route.destination} does not match outbound timetable flight route ${outboundTimetableFlight.route.origin} -> ${outboundTimetableFlight.route.destination}`);
     }
   } else {
-    throw new Error(`Cannot create one_way_selected booking state from ${state.kind}`);
+    throw new Error(`Cannot create outbound flight booking state from ${state.kind}`);
+  }
+}
+
+export function oneWayOnly(state: BookingState): BookingState {
+  if (state.kind === 'outbound_flight') {
+    return { kind: 'one_way_booking', outboundTimetableFlight: state.outboundTimetableFlight, outboundFlight: state.outboundFlight };
+  } else {
+    throw new Error(`Cannot create one_way_booking booking state from ${state.kind}`);
   }
 }
 
 export function requestReturnFlight(state: BookingState, returnRoute: AirRoute): BookingState {
-  if (state.kind === 'one_way_selected') {
+  if (state.kind === 'outbound_flight') {
     // As far as the demo goes there will always be a return route - but in reality there may not be
     if (state.outboundTimetableFlight.route.origin === returnRoute.destination && state.outboundTimetableFlight.route.destination === returnRoute.origin) {
 
@@ -223,14 +242,36 @@ export function addReturnDate(state: BookingState, nominalReturnDate: string, ti
   }
 }
 
-export function selectReturnBooking(state: BookingState, inboundTimetableFlight: TimetableFlight, inboundFlight: Flight): BookingState {
+export function selectReturnFlight(state: BookingState, inboundTimetableFlight: TimetableFlight, inboundFlight: Flight): BookingState {
   if (state.kind === 'nominal_return_date') {
     if (state.outboundTimetableFlight.route.origin === inboundTimetableFlight.route.destination && state.outboundTimetableFlight.route.destination === inboundTimetableFlight.route.origin) {
-      return { kind: 'return_selected', outboundTimetableFlight: state.outboundTimetableFlight, outboundFlight: state.outboundFlight, inboundTimetableFlight: inboundTimetableFlight, inboundFlight: inboundFlight };
+      return { kind: 'return_booking', outboundTimetableFlight: state.outboundTimetableFlight, outboundFlight: state.outboundFlight, inboundTimetableFlight: inboundTimetableFlight, inboundFlight: inboundFlight };
     } else {
       throw new Error(`State outbound  route ${state.outboundTimetableFlight.route.origin} -> ${state.outboundTimetableFlight.route.destination} does not match inbound route ${inboundTimetableFlight.route.origin} -> ${inboundTimetableFlight.route.destination}`);
     }
   } else {
-    throw new Error(`Cannot create return selected state from ${state.kind}`);
+    throw new Error(`Cannot create return booking state from ${state.kind}`);
+  }
+}
+
+export function CreateBooking(state: BookingState, tickets: Ticket[]): FlightBooking {
+  if (state.kind === 'return_booking') {
+    return {
+      kind: 'return',
+      outboundDate: state.outboundFlight.date,
+      outboundFlightNumber: state.outboundTimetableFlight.flightNumber,
+      inboundDate: state.inboundFlight.date,
+      inboundFlightNumber: state.inboundTimetableFlight.flightNumber,
+      tickets: tickets,
+    };
+  } else if (state.kind === 'one_way_booking') {
+    return {
+      kind: 'oneWay',
+      date: state.outboundFlight.date,
+      flightNumber: state.outboundTimetableFlight.flightNumber,
+      tickets: tickets,
+    };
+  } else {
+    throw new Error(`Cannot create booking created state from ${state.kind}`);
   }
 }
