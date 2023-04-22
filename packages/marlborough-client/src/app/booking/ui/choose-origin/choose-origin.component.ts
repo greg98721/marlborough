@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookingStart, BookingState } from 'src/app/booking/feature/make-booking/booking-state';
 import { Airport } from '@marlborough/model';
@@ -20,7 +20,10 @@ export class ChooseOriginComponent {
     }
   }
 
-  @Output() originSelected: (origin: string) => void = () => {};
+  @Output() originSelected = new EventEmitter<Airport>();
+  selectOrigin(origin: Airport) {
+    this.originSelected.emit(origin);
+  }
 
   vm?: BookingStart = undefined;
 }

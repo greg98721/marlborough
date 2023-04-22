@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookingState, OutboundFlight } from 'src/app/booking/feature/make-booking/booking-state';
 import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
@@ -19,8 +19,15 @@ export class ChooseReturnComponent {
     }
   }
 
-  @Output() oneWaySelected: () => void = () => {};
-  @Output() returnSelected: () => void = () => {};
+  @Output() oneWaySelected = new EventEmitter();
+  selectOneWay() {
+    this.oneWaySelected.emit();
+  }
+
+  @Output() returnSelected = new EventEmitter();
+  selectReturn() {
+    this.returnSelected.emit();
+  }
 
   vm?: OutboundFlight = undefined;
 

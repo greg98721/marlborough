@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { BookingDestination, BookingState } from 'src/app/booking/feature/make-booking/booking-state';
@@ -33,7 +33,10 @@ export class ChooseDateComponent {
     }
   }
 
-  @Output() dateSelected: (date: Date) => void = () => {};
+  @Output() dateSelected = new EventEmitter<Date>();
+  selectDate(date: Date) {
+    this.dateSelected.emit(date);
+  }
 
   vm?: {
     route: AirRoute,

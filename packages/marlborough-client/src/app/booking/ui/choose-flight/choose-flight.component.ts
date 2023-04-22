@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon'
 import { BookingState, NominalBookingDate } from 'src/app/booking/feature/make-booking/booking-state';
@@ -34,7 +34,10 @@ export class ChooseFlightComponent {
     }
   }
 
-  @Output() flightSelected: (flight: Flight) => void = () => {};
+  @Output() flightSelected = new EventEmitter<Flight>();
+  selectFlight(flight: Flight) {
+    this.flightSelected.emit(flight);
+  }
 
   vm?: {
     route: AirRoute,

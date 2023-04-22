@@ -2,6 +2,6 @@
   <div class="origin-summary">Taking off from {{vm.origin | cityName}}</div>
   <div class="question">Flying to?</div>
   <div class="destination-list">
-    <a *ngFor="let route of vm.destinationRoutes" (click)="destinationSelected(route)">{{ route.destination | cityName }}</a>
+    <a *ngFor="let route of vm.destinationRoutes" (click)="chooseDestination(route)">{{ route.destination | cityName }}</a>
   </div>
 </div>

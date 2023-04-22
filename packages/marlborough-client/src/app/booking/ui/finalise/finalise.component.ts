@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { parseISO } from 'date-fns/fp'; // Note using the functional version of the date-fns library
@@ -27,7 +27,10 @@ export class FinaliseComponent {
     }
   }
 
-  @Output() makeBooking: () => void = () => {};
+  @Output() BookingDefined = new EventEmitter();
+  makeBooking() {
+    this.BookingDefined.emit(this.createBooking());
+  }
 
   private _tickets: Ticket[] = [];
 

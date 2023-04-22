@@ -17,11 +17,24 @@ import {
 import { FlightService } from 'src/app/timetable/data-access/flight.service';
 import { LoadingService } from 'src/app/shared/services/loading.service';
 import { AirRoute, Airport, Flight, Ticket, cityName } from '@marlborough/model';
+import { ChooseOriginComponent } from '../../ui/choose-origin/choose-origin.component';
+import { ChooseDestinationComponent } from '../../ui/choose-destination/choose-destination.component';
+import { ChooseDateComponent } from '../../ui/choose-date/choose-date.component';
+import { ChooseFlightComponent } from '../../ui/choose-flight/choose-flight.component';
+import { ChooseReturnComponent } from '../../ui/choose-return/choose-return.component';
+import { FinaliseComponent } from '../../ui/finalise/finalise.component';
 
 @Component({
   selector: 'app-make-booking',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    ChooseOriginComponent,
+    ChooseDestinationComponent,
+    ChooseDateComponent,
+    ChooseFlightComponent,
+    ChooseReturnComponent,
+    FinaliseComponent],
   templateUrl: './make-booking.component.html',
   styleUrls: ['./make-booking.component.scss']
 })
@@ -55,7 +68,7 @@ export class MakeBookingComponent {
     });
   }
 
-  bookingState: Observable<BookingState> = this._bookingStateSubject.asObservable();
+  bookingState$: Observable<BookingState> = this._bookingStateSubject.asObservable();
 
   selectOrigin(origin: Airport) {
     this._loadingService.setLoadingWhile$(this._flightService.getDestinations$(origin)).subscribe(destinationRoutes => {
@@ -69,7 +82,7 @@ export class MakeBookingComponent {
     this._updateState(newState);
   }
 
-  selectOutboundDate(date: Date) {
+  selectDate(date: Date) {
     const datestring = formatISOWithOptions({ representation: 'date' }, date);
     const state = this._currentState;
     if (state.kind === 'destination') {
@@ -77,17 +90,30 @@ export class MakeBookingComponent {
         const newState = addDate(state, datestring, flights);
         this._updateState(newState);
       });
+    } else if (state.kind === 'return_flight_requested') {
+      this._loadingService.setLoadingWhile$(this._flightService.getFlights$(state.returnRoute.origin, state.returnRoute.destination)).subscribe(flights => {
+        const newState = addReturnDate(state, datestring, flights);
+        this._updateState(newState);
+      });
     } else {
       throw new Error(`Cannot set the nominal_date state from ${state.kind}`);
     }
   }
 
-  selectOutboundFlight(flight: Flight) {
+  selectFlight(flight: Flight) {
     const state = this._currentState;
     if (state.kind === 'nominal_date') {
       const timetableFlight = state.timetableFlights.find(t => t.timetableFlight.flightNumber === flight.flightNumber)?.timetableFlight;
       if (timetableFlight) {
         const newState = selectOutboundFlight(state, timetableFlight, flight);
+        this._updateState(newState);
+      } else {
+        throw new Error(`Cannot find timetable flight for flight ${flight.flightNumber}`);
+      }
+    } else if (state.kind === 'nominal_return_date') {
+      const returnTimetableFlight = state.timetableReturnFlights.find(t => t.timetableFlight.flightNumber === flight.flightNumber)?.timetableFlight;
+      if (returnTimetableFlight) {
+        const newState = selectOutboundFlight(state, returnTimetableFlight, flight);
         this._updateState(newState);
       } else {
         throw new Error(`Cannot find timetable flight for flight ${flight.flightNumber}`);
@@ -109,34 +135,6 @@ export class MakeBookingComponent {
       this._updateState(newState);
     } else {
       throw new Error(`Cannot set the return_flight_requested state from ${state.kind}`);
-    }
-  }
-
-  selectInboundDate(date: Date) {
-    const datestring = formatISOWithOptions({ representation: 'date' }, date);
-    const state = this._currentState;
-    if (state.kind === 'return_flight_requested') {
-      this._loadingService.setLoadingWhile$(this._flightService.getFlights$(state.returnRoute.origin, state.returnRoute.destination)).subscribe(flights => {
-        const newState = addReturnDate(state, datestring, flights);
-        this._updateState(newState);
-      });
-    } else {
-      throw new Error(`Cannot set the nominal return date state from ${state.kind}`);
-    }
-  }
-
-  selectInboundFlight(returnFlight: Flight) {
-    const state = this._currentState;
-    if (state.kind === 'nominal_return_date') {
-      const returnTimetableFlight = state.timetableReturnFlights.find(t => t.timetableFlight.flightNumber === returnFlight.flightNumber)?.timetableFlight;
-      if (returnTimetableFlight) {
-        const newState = selectOutboundFlight(state, returnTimetableFlight, returnFlight);
-        this._updateState(newState);
-      } else {
-        throw new Error(`Cannot find timetable flight for flight ${returnFlight.flightNumber}`);
-      }
-    } else {
-      throw new Error(`Cannot set the inbound_flight state from ${state.kind}`);
     }
   }
 

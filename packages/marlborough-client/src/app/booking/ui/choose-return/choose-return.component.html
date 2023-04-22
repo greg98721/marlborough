@@ -1,4 +1,4 @@
 <div *ngIf="vm !== undefined">
-  <a (click)="oneWaySelected()">Book a one way flight</a>
-  <a (click)="returnSelected()">Add a return flight to {{ vm.outboundTimetableFlight.route.origin | cityName }}</a>
+  <a (click)="selectOneWay()">Book a one way flight</a>
+  <a (click)="selectReturn()">Add a return flight to {{ vm.outboundTimetableFlight.route.origin | cityName }}</a>
 </div>
