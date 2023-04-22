@@ -1,7 +1,7 @@
 import { Component, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookingState, OutboundFlight } from 'src/app/booking/feature/make-booking/booking-state';
-import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
+import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
 
 @Component({
   selector: 'app-choose-return',

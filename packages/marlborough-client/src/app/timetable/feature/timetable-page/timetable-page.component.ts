@@ -5,9 +5,9 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { addMinutes, format } from 'date-fns/fp';
 import { Observable, map } from 'rxjs';
 import { Airport, cityName, isAirport, TimetableFlight } from '@marlborough/model';
-import { WeekDisplayComponent } from 'src/app/common/components/week-display/week-display.component';
-import { MinutePipe } from 'src/app/common/pipes/minute.pipe';
-import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
+import { WeekDisplayComponent } from 'src/app/shared/ui/week-display/week-display.component';
+import { MinutePipe } from 'src/app/shared/pipes/minute.pipe';
+import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
 
 @Component({
   selector: 'app-timetable-page',

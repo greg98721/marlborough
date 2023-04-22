@@ -2,7 +2,7 @@ import { Component, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { BookingDestination, BookingState } from 'src/app/booking/feature/make-booking/booking-state';
-import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
+import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { AirRoute } from '@marlborough/model';

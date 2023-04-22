@@ -1,7 +1,7 @@
 import { inject } from "@angular/core";
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { map, Observable, of } from "rxjs";
-import { UserService } from "../services/user.service";
+import { UserService } from "../data-access/user.service";
 
 export function isAuthenticated$(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
   const userService = inject(UserService);

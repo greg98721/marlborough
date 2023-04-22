@@ -14,8 +14,8 @@ import {
   requestReturnFlight,
   addReturnDate
 } from './booking-state';
-import { FlightService } from 'src/app/timetable/services/flight.service';
-import { LoadingService } from 'src/app/common/services/loading.service';
+import { FlightService } from 'src/app/timetable/data-access/flight.service';
+import { LoadingService } from 'src/app/shared/services/loading.service';
 import { AirRoute, Airport, Flight, Ticket, cityName } from '@marlborough/model';
 
 @Component({

@@ -4,8 +4,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { parseISO } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { BookingState, DetailsForOneWayBooking, DetailsForReturnBooking } from 'src/app/booking/feature/make-booking/booking-state';
-import { MinutePipe } from 'src/app/common/pipes/minute.pipe';
-import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
+import { MinutePipe } from 'src/app/shared/pipes/minute.pipe';
+import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
 import { Flight, FlightBooking, Ticket } from '@marlborough/model';
 
 @Component({

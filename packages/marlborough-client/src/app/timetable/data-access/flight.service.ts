@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 
 import { Airport, AirRoute, cityName, Flight, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
-import { AppConfigService } from 'src/app/common/services/app-config.service';
+import { AppConfigService } from 'src/app/shared/services/app-config.service';
 
 @Injectable({
   providedIn: 'root'

@@ -2,8 +2,8 @@ import { Injectable, inject } from "@angular/core";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
 import { Airport, Flight, TimetableFlight } from "@marlborough/model";
 import { Observable, map } from "rxjs";
-import { FlightService } from "../services/flight.service";
-import { LoadingService } from 'src/app/common/services/loading.service';
+import { FlightService } from "../data-access/flight.service";
+import { LoadingService } from 'src/app/shared/services/loading.service';
 
 
 @Injectable({ providedIn: 'root' })

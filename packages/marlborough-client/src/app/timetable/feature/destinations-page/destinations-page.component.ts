@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FlightService } from 'src/app/timetable/services/flight.service';
+import { FlightService } from 'src/app/timetable/data-access/flight.service';
 import { Observable, map } from 'rxjs';
 import { Airport, cityName } from '@marlborough/model';
 import { RouterModule } from '@angular/router';
-import { CityNamePipe } from 'src/app/common/pipes/city-name.pipe';
+import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
 
 @Component({
   selector: 'app-destinations-page',

@@ -3,8 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { map, Observable, switchMap, of, tap, catchError } from 'rxjs';
 import { User } from '@marlborough/model';
-import { LoginDialogComponent } from '../components/login-dialog/login-dialog.component';
-import { AppConfigService } from 'src/app/common/services/app-config.service';
+import { LoginDialogComponent } from '../ui/login-dialog/login-dialog.component';
+import { AppConfigService } from 'src/app/shared/services/app-config.service';
 
 @Injectable({
   providedIn: 'root'
