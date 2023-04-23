@@ -12,7 +12,8 @@ import {
   oneWayOnly,
   selectOutboundFlight,
   requestReturnFlight,
-  addReturnDate
+  addReturnDate,
+  selectReturnFlight
 } from './booking-state';
 import { FlightService } from 'src/app/timetable/data-access/flight.service';
 import { LoadingService } from 'src/app/shared/services/loading.service';
@@ -113,7 +114,7 @@ export class MakeBookingComponent {
     } else if (state.kind === 'nominal_return_date') {
       const returnTimetableFlight = state.timetableReturnFlights.find(t => t.timetableFlight.flightNumber === flight.flightNumber)?.timetableFlight;
       if (returnTimetableFlight) {
-        const newState = selectOutboundFlight(state, returnTimetableFlight, flight);
+        const newState = selectReturnFlight(state, returnTimetableFlight, flight);
         this._updateState(newState);
       } else {
         throw new Error(`Cannot find timetable flight for flight ${flight.flightNumber}`);

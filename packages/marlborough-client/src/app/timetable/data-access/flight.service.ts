@@ -4,6 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { Airport, AirRoute, cityName, Flight, isAirport, TimetableFlight } from '@marlborough/model';
 import { Observable, map, catchError } from 'rxjs';
 import { AppConfigService } from 'src/app/shared/services/app-config.service';
+import { uniqueObjects } from 'src/app/shared/utility/useful-functions';
 
 @Injectable({
   providedIn: 'root'
@@ -52,8 +53,7 @@ export class FlightService {
       map(data => {
         if (data.timetable.length > 0) {
           // get the unique destinations
-          const a = data.timetable.map(t => t.route);
-          const unique = [...new Set(a)];
+          const unique = uniqueObjects<AirRoute>(data.timetable.map(t => t.route));
           return unique.sort((a, b) => cityName(a.destination).localeCompare(cityName(b.destination)));
         } else {
           throw Error('Should never get here as we have checked we had an origin for _getDestinations')
