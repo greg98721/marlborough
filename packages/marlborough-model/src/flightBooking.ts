@@ -5,7 +5,8 @@ export type TicketType = 'unknown' | 'full' | 'discount';
 export type PassengerType = 'unknown' | 'adult' | 'child';
 
 export interface Ticket {
-  customerName: string;
+  firstName: string;
+  surname: string;
   ticketType: TicketType;
   passengerType: PassengerType;
   // seatNumber: string;

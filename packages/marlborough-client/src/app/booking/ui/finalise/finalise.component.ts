@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { ReactiveFormsModule } from '@angular/forms';
 import { parseISO } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 import { BookingState, DetailsForOneWayBooking, DetailsForReturnBooking } from 'src/app/booking/feature/make-booking/booking-state';
@@ -11,7 +12,7 @@ import { Flight, FlightBooking, Ticket } from '@marlborough/model';
 @Component({
   selector: 'app-finalise',
   standalone: true,
-  imports: [CommonModule, MatButtonToggleModule, MinutePipe, CityNamePipe],
+  imports: [CommonModule, ReactiveFormsModule, MatButtonToggleModule, MinutePipe, CityNamePipe],
   templateUrl: './finalise.component.html',
   styleUrls: ['./finalise.component.scss']
 })
@@ -31,6 +32,8 @@ export class FinaliseComponent {
   makeBooking() {
     this.BookingDefined.emit(this.createBooking());
   }
+
+  // ticketForm = new FormGroup({
 
   private _tickets: Ticket[] = [];
 
