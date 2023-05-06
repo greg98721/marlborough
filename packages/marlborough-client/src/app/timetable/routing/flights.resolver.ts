@@ -1,5 +1,5 @@
 import { Injectable, inject } from "@angular/core";
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Airport, Flight, TimetableFlight } from "@marlborough/model";
 import { Observable, map } from "rxjs";
 import { FlightService } from "../data-access/flight.service";
@@ -7,7 +7,7 @@ import { LoadingService } from 'src/app/shared/services/loading.service';
 
 
 @Injectable({ providedIn: 'root' })
-export class FlightsResolver implements Resolve<{ origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selectedDate: string}> {
+export class FlightsResolver  {
 
   private _flightService = inject(FlightService);
   private _loadingService = inject(LoadingService);
