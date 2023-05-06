@@ -19,7 +19,7 @@
       <div class="table-content">{{ timetable.departs | minute }}</div>
       <div class="table-content">{{ timetable.arrives | minute }}</div>
       <div class="table-content">{{ timetable.aircraft }}</div>
-      <app-week-display [days]="timetable.days"></app-week-display>
+      <app-week-display [days]="timetable.days" />
       <div><!--Empty space for margins --></div>
     </ng-container>
   </ng-container>

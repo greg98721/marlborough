@@ -1,8 +1,8 @@
 <div *ngIf="bookingState$ | async as state">
-  <app-choose-origin *ngIf="state.kind === 'start'" [bookingState]="state" (originSelected)="selectOrigin($event)"></app-choose-origin>
-  <app-choose-destination *ngIf="state.kind === 'origin'" [bookingState]="state" (destinationSelected)="selectDestination($event)"></app-choose-destination>
-  <app-choose-date *ngIf="state.kind === 'destination' || state.kind === 'return_flight_requested'" [bookingState]="state" (dateSelected)="selectDate($event)"></app-choose-date>
-  <app-choose-flight *ngIf="state.kind === 'nominal_date' || state.kind === 'nominal_return_date'" [bookingState]="state" (flightSelected)="selectFlight($event)"></app-choose-flight>
-  <app-choose-return *ngIf="state.kind === 'outbound_flight'" [bookingState]="state" (oneWaySelected)="selectOneWay()" (returnSelected)="selectReturn()"></app-choose-return>
-  <app-finalise *ngIf="state.kind === 'one_way_booking' || state.kind === 'return_booking'" [bookingState]="state"></app-finalise>
+  <app-choose-origin *ngIf="state.kind === 'start'" [bookingState]="state" (originSelected)="selectOrigin($event)" />
+  <app-choose-destination *ngIf="state.kind === 'origin'" [bookingState]="state" (destinationSelected)="selectDestination($event)" />
+  <app-choose-date *ngIf="state.kind === 'destination' || state.kind === 'return_flight_requested'" [bookingState]="state" (dateSelected)="selectDate($event)" />
+  <app-choose-flight *ngIf="state.kind === 'nominal_date' || state.kind === 'nominal_return_date'" [bookingState]="state" (flightSelected)="selectFlight($event)" />
+  <app-choose-return *ngIf="state.kind === 'outbound_flight'" [bookingState]="state" (oneWaySelected)="selectOneWay()" (returnSelected)="selectReturn()" />
+  <app-finalise *ngIf="state.kind === 'one_way_booking' || state.kind === 'return_booking'" [bookingState]="state" />
 </div>
