@@ -46,13 +46,9 @@ export class ChooseFlightComponent {
     timetableFlights: { timetableFlight: TimetableFlight, flights: Flight[] }[]
   } = undefined;
 
-  _seatsAvailable(flight: Flight): boolean {
-    return seatsAvailable(flight);
-  }
+  _seatsAvailable = seatsAvailable
 
-  _minPrice(flight: Flight): number {
-    return minPrice(flight);
-  }
+  _minPrice = minPrice;
 
   numberOfCheapestSeats(flight: Flight): number {
     return flight.emptyDiscountSeats > 0 ? flight.emptyDiscountSeats : flight.emptyFullPriceSeats;
