@@ -1,10 +1,8 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
-import { addMinutes, format } from 'date-fns/fp';
-import { Observable, map } from 'rxjs';
-import { Airport, cityName, isAirport, TimetableFlight } from '@marlborough/model';
+import { Airport, TimetableFlight } from '@marlborough/model';
 import { WeekDisplayComponent } from 'src/app/shared/ui/week-display/week-display.component';
 import { MinutePipe } from 'src/app/shared/pipes/minute.pipe';
 import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
@@ -18,7 +16,11 @@ import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
 })
 export class TimetablePageComponent {
 
-  private _route = inject(ActivatedRoute);
-
-  vm$: Observable<{ origin: Airport, timetables: { destination: Airport; destinationTimetables: TimetableFlight[] }[]}> = this._route.data.pipe(map(d => d['pageData']));
+  @Input() vm?: {
+    origin: Airport,
+    timetables: {
+      destination: Airport;
+      destinationTimetables: TimetableFlight[]
+    }[]
+  };
 }

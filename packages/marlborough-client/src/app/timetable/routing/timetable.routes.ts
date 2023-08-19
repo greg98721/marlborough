@@ -7,6 +7,6 @@ import { resolveTimetables } from './timetable.resolver';
 
 export const TIMETABLE_ROUTES: Routes = [
   { path: 'destinations', component: DestinationsPageComponent },
-  { path: 'timetable/:origin', component: TimetablePageComponent, resolve: { pageData: resolveTimetables } },
-  { path: 'flights', component: FlightsPageComponent, resolve: { pageData: resolveFlights } },
+  { path: 'timetable/:origin', component: TimetablePageComponent, resolve: { vm: resolveTimetables } },
+  { path: 'flights', component: FlightsPageComponent, resolve: { vm: resolveFlights } },
 ];

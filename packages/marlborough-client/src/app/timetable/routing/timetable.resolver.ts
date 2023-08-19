@@ -11,7 +11,7 @@ export const resolveTimetables: ResolveFn<{ origin: Airport, timetables: { desti
     _: RouterStateSnapshot,
     flightService = inject(FlightService),
     loadingService = inject(LoadingService)
-  ): Observable<{ origin: Airport, timetables: { destination: Airport; destinationTimetables: TimetableFlight[] }[] }> => {
+  ) => {
     const origin = route.paramMap.get('origin');
 
     if (origin && isAirport(origin)) {

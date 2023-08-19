@@ -1,11 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon'
-import { Observable, map } from 'rxjs';
-import { eachDayOfInterval, formatISOWithOptions, parseISO, addDays, differenceInCalendarDays, isBefore, isSameDay, isEqual } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
-import { Airport, Flight, maximumBookingDay, startOfDayInTimezone, TimetableFlight, timezone, EMPTY_FLIGHT, seatsAvailable, minPrice } from '@marlborough/model';
+import { Airport, Flight, TimetableFlight, seatsAvailable, minPrice } from '@marlborough/model';
 import { MinutePipe } from 'src/app/shared/pipes/minute.pipe';
 import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
 
@@ -17,62 +15,27 @@ import { CityNamePipe } from 'src/app/shared/pipes/city-name.pipe';
   styleUrls: ['./flights-page.component.scss']
 })
 export class FlightsPageComponent {
-  private _route = inject(ActivatedRoute);
-  private _router = inject(Router);
+  @Input() vm?: {
+    origin: Airport,
+    destination: Airport,
+    flightData: {
+      timetableFlight: TimetableFlight;
+      flights: Flight[]
+    }[];
+    selected: number,
+    dayRange: Date[]
+  };
 
-  vm$: Observable<{ origin: Airport, destination: Airport, flightData: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selected: number, dayRange: Date[] }> =
-    this._route.data.pipe(
-      map(d => {
-        const allTimetableFlights = d['pageData'] as { origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selectedDate: string };
-        const originTimeZone = timezone(allTimetableFlights.origin);
-        const sel = parseISO(allTimetableFlights.selectedDate);
-        const selected = startOfDayInTimezone(originTimeZone, sel);
-        const earliest = addDays(1, startOfDayInTimezone(originTimeZone, new Date()));
-        const destination = allTimetableFlights.flights[0]?.timetableFlight.route.destination;
+  _seatsAvailable(flight: Flight): boolean {
+    return seatsAvailable(flight);
+  }
 
-        // we ant a five day selection around the selected date taking into account where the selected date is near one end of the possible range
-        const gap = differenceInCalendarDays(earliest, selected);
-        let dayRange: Date[];
-        let selIndex: number;
-        if (gap < 3) {
-          dayRange = eachDayOfInterval({ start: earliest, end: addDays(4, earliest) })
-          selIndex = gap;
-        } else if (gap > (maximumBookingDay - 2)) {
-          dayRange = eachDayOfInterval({ start: addDays(maximumBookingDay - 4, earliest), end: addDays(maximumBookingDay, earliest) })
-          selIndex = gap - maximumBookingDay + 4;
-        } else {
-          dayRange = eachDayOfInterval({ start: addDays(-2, selected), end: addDays(+2, selected) })
-          selIndex = 2;
-        }
+  _minPrice(flight: Flight): number {
+    return minPrice(flight);
+  }
 
-        if (dayRange.length !== 5) {
-          throw new Error(`Did not create valid day range - length = ${dayRange.length}`);
-        }
-
-        const withinRange = allTimetableFlights.flights.map(f => {
-          const parsed = f.flights.map(p => ({ date: parseISO(p.date), flight: p }));
-          const filtered = dayRange.map(d => parsed.find(p => isSameDay(p.date, d))?.flight ?? EMPTY_FLIGHT);
-          return { timetableFlight: f.timetableFlight, flights: filtered };
-        });
-        const filtered = withinRange.filter(f => f.flights.filter(l => l.flightNumber !== '').length > 0);
-        const sorted = filtered.sort((a, b) => (a.timetableFlight.departs - b.timetableFlight.departs));
-        return { origin: allTimetableFlights.origin, destination: destination, flightData: sorted, selected: selIndex, dayRange: dayRange };
-      }));
-
-    dateFormat(d: Date): string {
-      return formatISOWithOptions({representation: 'date'}, d);
-    }
-
-    _seatsAvailable(flight: Flight): boolean {
-      return seatsAvailable(flight);
-    }
-
-    _minPrice(flight: Flight): number {
-      return minPrice(flight);
-    }
-
-    numberOfCheapestSeats(flight: Flight): number {
-      return flight.emptyDiscountSeats > 0 ? flight.emptyDiscountSeats : flight.emptyFullPriceSeats;
-    }
+  numberOfCheapestSeats(flight: Flight): number {
+    return flight.emptyDiscountSeats > 0 ? flight.emptyDiscountSeats : flight.emptyFullPriceSeats;
+  }
 
 }
