@@ -22,8 +22,8 @@ export class FlightsPageComponent {
 
   vm$: Observable<{ origin: Airport, destination: Airport, flightData: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selected: number, dayRange: Date[] }> =
     this._route.data.pipe(
-      map(t => {
-        const allTimetableFlights = t['airport'] as { origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selectedDate: string };
+      map(d => {
+        const allTimetableFlights = d['pageData'] as { origin: Airport, flights: { timetableFlight: TimetableFlight; flights: Flight[] }[]; selectedDate: string };
         const originTimeZone = timezone(allTimetableFlights.origin);
         const sel = parseISO(allTimetableFlights.selectedDate);
         const selected = startOfDayInTimezone(originTimeZone, sel);

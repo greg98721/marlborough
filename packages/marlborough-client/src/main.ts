@@ -1,6 +1,6 @@
 import { APP_INITIALIZER, enableProdMode, ErrorHandler, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -40,7 +40,7 @@ bootstrapApplication(AppComponent, {
       useFactory: (service: AppConfigService) => () => service.load(),  // we are setting the function here - not running it
       multi: true
     },
-    provideRouter(ROUTES),
+    provideRouter(ROUTES, withComponentInputBinding()),
     {
       provide: ErrorHandler,
       useClass: CustomErrorHandler

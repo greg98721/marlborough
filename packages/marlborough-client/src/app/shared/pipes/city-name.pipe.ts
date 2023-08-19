@@ -6,8 +6,8 @@ import { Airport, cityName, isAirport, TimetableFlight } from '@marlborough/mode
   standalone: true,
 })
 export class CityNamePipe implements PipeTransform {
-  transform(value: string) {
-    if (isAirport(value)) {
+  transform(value?: string) {
+    if (value && isAirport(value)) {
       return cityName(value);
     } else {
       return '';

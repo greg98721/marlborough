@@ -1,6 +1,6 @@
 <div class="timetable-list">
   <div><!--Empty space for margins --></div>
-  <div class="page-header">Flights from {{origin$ | async}}</div>
+  <div class="page-header">Flights from {{ (vm$ | async)?.origin | cityName }}</div>
   <div><!--Empty space for margins --></div>
   <div><!--Empty space for margins --></div>
   <div class="header">Flight Number</div>
@@ -9,11 +9,11 @@
   <div class="header">Aircraft Type</div>
   <div class="header">Days</div>
   <div><!--Empty space for margins --></div>
-  <ng-container *ngFor="let dest of timetables$ | async">
+  <ng-container *ngFor="let dest of (vm$ | async)?.timetables">
     <div><!--Empty space for margins --></div>
     <a [routerLink]="['/timetable', dest.destination]" class="destination">{{ dest.destination | cityName}}</a>
     <div><!--Empty space for margins --></div>
-    <ng-container *ngFor="let timetable of dest.timetables">
+    <ng-container *ngFor="let timetable of dest.destinationTimetables">
       <div><!--Empty space for margins --></div>
       <div class="table-content">{{ timetable.flightNumber }}</div>
       <div class="table-content">{{ timetable.departs | minute }}</div>
