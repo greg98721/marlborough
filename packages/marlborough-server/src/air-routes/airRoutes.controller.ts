@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ScheduleService } from '../schedule/schedule.service';
 
-@Controller('routes')
+@Controller('api/routes')
 export class AirRoutesController {
   constructor(private readonly _scheduleService: ScheduleService) {}
 

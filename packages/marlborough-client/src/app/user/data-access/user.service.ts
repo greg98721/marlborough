@@ -38,14 +38,14 @@ export class UserService {
       }),
       switchMap(loginDetails => {
         if (loginDetails) {
-          const loginUrl = this._config.apiUrl('auth/login');
+          const loginUrl = this._config.apiUrl('api/auth/login');
           const loginBody = { username: loginDetails.username, password: loginDetails.password };
           return this._http.post(loginUrl, loginBody).pipe(
             tap((response: any) => {
               this._accessToken = response.access_token;
             }),
             switchMap((loginResponse: any) => {
-              const userUrl = this._config.apiUrl(`auth/user/${loginDetails.username}`);
+              const userUrl = this._config.apiUrl(`api/auth/user/${loginDetails.username}`);
               return this._http.get(userUrl).pipe(
                 map((userResponse: any) => {
                   return {

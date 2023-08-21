@@ -16,7 +16,7 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ScheduleService } from '../schedule/schedule.service';
 
-@Controller('flights')
+@Controller('api/flights')
 export class FlightsController {
   constructor(private readonly _scheduleService: ScheduleService) {}
 

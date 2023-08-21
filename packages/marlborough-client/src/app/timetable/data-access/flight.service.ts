@@ -15,7 +15,7 @@ export class FlightService {
   private _config = inject(AppConfigService);
 
   getOrigins$(): Observable<Airport[]> {
-    const url = this._config.apiUrl('routes');
+    const url = this._config.apiUrl('api/routes');
     return this._http.get(url).pipe(
       map(response => {
         const rawList = response as string[];
@@ -31,7 +31,7 @@ export class FlightService {
   }
 
   getTimetable$(origin: Airport): Observable<{ origin: Airport; timetable: TimetableFlight[] }> {
-    const url = this._config.apiUrl(`routes/timetable/${origin}`);
+    const url = this._config.apiUrl(`api/routes/timetable/${origin}`);
     return this._http.get(url).pipe(
       map(response => {
         const rawList = response as any[];
@@ -63,7 +63,7 @@ export class FlightService {
   }
 
   getTimetableFlight$(flightNumber: string, dateOfFlight: string): Observable<{ timetableFlight: TimetableFlight, flight: Flight }> {
-    const url = this._config.apiUrl(`flights/toBook/${flightNumber}/${dateOfFlight}`);
+    const url = this._config.apiUrl(`api/flights/toBook/${flightNumber}/${dateOfFlight}`);
     return this._http.get(url).pipe(
       map(response => {
         return response as { timetableFlight: TimetableFlight, flight: Flight };
@@ -73,7 +73,7 @@ export class FlightService {
   }
 
   getFlights$(origin: string, destination: string): Observable<{ timetableFlight: TimetableFlight; flights: Flight[] }[]> {
-    const url = this._config.apiUrl(`flights?origin=${origin}&dest=${destination}`);
+    const url = this._config.apiUrl(`api/flights?origin=${origin}&dest=${destination}`);
     return this._http.get(url).pipe(
       map(response => {
         const flights = response as { timetableFlight: TimetableFlight; flights: Flight[] }[];
