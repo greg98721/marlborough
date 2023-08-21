@@ -12,7 +12,7 @@ import { catchError, Observable, retry, throwError, timer, tap, partition, merge
 @Injectable()
 export class GlobalHttpErrorHandler implements HttpInterceptor {
 
-  /** Only want to rety requets when we receive a server error. Any other response - ther server understood the request and rejected it for a good reason */
+  /** Only want to rety requets when we receive a server error. Any other response - the server understood the request and rejected it for a good reason */
   shouldRetry(error: HttpErrorResponse, retryCount: number) {
     if (error.status >= 500) {
       console.log(`HTTP Server Error: retry: ${retryCount}`)

@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AirRoutesController } from './air-routes/airRoutes.controller';
@@ -11,6 +16,7 @@ import { AuthController } from './auth/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { FrontendMiddleware } from './FrontendMiddleware';
 
 @Module({
   imports: [
@@ -38,4 +44,11 @@ import { JwtStrategy } from './auth/jwt.strategy';
     JwtStrategy,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(FrontendMiddleware).forRoutes({
+      path: '/**', // For all routes
+      method: RequestMethod.ALL, // For all methods
+    });
+  }
+}
