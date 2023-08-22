@@ -258,15 +258,18 @@ export function CreateBooking(state: BookingState, tickets: Ticket[]): FlightBoo
   if (state.kind === 'return_booking') {
     return {
       kind: 'return',
+      purchaserUsername: '',
       outboundDate: state.outboundFlight.date,
       outboundFlightNumber: state.outboundTimetableFlight.flightNumber,
+      outboundTickets: tickets,
       inboundDate: state.inboundFlight.date,
       inboundFlightNumber: state.inboundTimetableFlight.flightNumber,
-      tickets: tickets,
+      inboundTickets: [],
     };
   } else if (state.kind === 'one_way_booking') {
     return {
       kind: 'oneWay',
+      purchaserUsername: '',
       date: state.outboundFlight.date,
       flightNumber: state.outboundTimetableFlight.flightNumber,
       tickets: tickets,

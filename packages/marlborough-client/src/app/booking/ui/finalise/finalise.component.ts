@@ -30,7 +30,7 @@ export class FinaliseComponent {
 
   @Output() BookingDefined = new EventEmitter();
   makeBooking() {
-    this.BookingDefined.emit(this.createBooking());
+    this.BookingDefined.emit(this.createBooking(''));
   }
 
   // ticketForm = new FormGroup({
@@ -39,10 +39,11 @@ export class FinaliseComponent {
 
   vm?: DetailsForOneWayBooking | DetailsForReturnBooking = undefined;
 
-  createBooking(): FlightBooking {
+  createBooking(username: string): FlightBooking {
     if (this.vm?.kind === 'one_way_booking') {
       return {
         kind: 'oneWay',
+        purchaserUsername: username,
         date: this.vm.outboundFlight.date,
         flightNumber: this.vm.outboundTimetableFlight.flightNumber,
         tickets: this._tickets
@@ -50,11 +51,13 @@ export class FinaliseComponent {
     } else if (this.vm?.kind === 'return_booking') {
       return {
         kind: 'return',
+        purchaserUsername: username,
         outboundDate: this.vm.outboundFlight.date,
         outboundFlightNumber: this.vm.outboundTimetableFlight.flightNumber,
+        inboundTickets: this._tickets,
         inboundDate: this.vm.inboundFlight.date,
         inboundFlightNumber: this.vm.inboundTimetableFlight.flightNumber,
-        tickets: this._tickets
+        outboundTickets: [],
       };
     } else {
       throw Error('Invalid state for ChooseOriginComponent')

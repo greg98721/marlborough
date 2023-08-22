@@ -10,7 +10,15 @@ export interface UserWithPassword extends User {
 @Injectable()
 export class UserService {
   private readonly _allUsers: UserWithPassword[] = [
-    { username: 'bob', password: 'topSecret', fullname: 'Bob Smith' },
+    {
+      username: 'bob',
+      password: 'topSecret',
+      firstName: 'Bob',
+      lastName: 'Smith',
+      birthDate: new Date(1973, 6, 21),
+      address: '16 Julian Street\nRedwoodtown\nBlenheim 7201',
+      customerCode: 'ABC001',
+    },
   ];
 
   findUser$(username: string): Observable<UserWithPassword | undefined> {

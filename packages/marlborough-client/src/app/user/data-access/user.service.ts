@@ -48,10 +48,7 @@ export class UserService {
               const userUrl = this._config.apiUrl(`api/auth/user/${loginDetails.username}`);
               return this._http.get(userUrl).pipe(
                 map((userResponse: any) => {
-                  return {
-                    username: userResponse.username,
-                    fullname: userResponse.fullname,
-                  };
+                  return userResponse as User;
                 }),
                 tap((user: User) => {
                   this._currentUser = user;
