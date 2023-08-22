@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject, Observable, map, partition, switchMap } from 'rxjs';
 import { formatISOWithOptions } from 'date-fns/fp'; // Note using the functional version of the date-fns library
@@ -38,14 +38,15 @@ import { FinaliseComponent } from '../../ui/finalise/finalise.component';
   templateUrl: './make-booking.component.html',
   styleUrls: ['./make-booking.component.scss']
 })
-export class MakeBookingComponent {
+export class MakeBookingComponent implements OnInit {
+
   @Input() origin?: Airport;
   private _flightService = inject(FlightService);
   private _loadingService = inject(LoadingService);
   private _bookingStateSubject = new BehaviorSubject<BookingState>({ kind: 'undefined' });
   private _bookingStateStack: BookingState[] = [];
 
-  constructor() {
+  ngOnInit(): void {
     // we can arrive here with or without an origin - so partition the query params to cope with both
     if (this.origin === undefined) {
       this._loadingService.setLoadingWhile$(this._flightService.getOrigins$()).subscribe(origins => {
