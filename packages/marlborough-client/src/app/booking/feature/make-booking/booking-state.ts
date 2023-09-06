@@ -1,4 +1,4 @@
-import { Airport, AirRoute, EMPTY_FLIGHT, Flight, FlightBooking, maximumBookingDay, startOfDayInTimezone, Ticket, TimetableFlight, timezone } from "@marlborough/model";
+import { Airport, AirRoute, EMPTY_FLIGHT, Flight, FlightBooking, maximumBookingDay, OneWayBooking, Passenger, PassengerType, ReturnBooking, startOfDayInTimezone, Ticket, TicketType, TimetableFlight, timezone } from "@marlborough/model";
 import { addDays, parseISO, differenceInCalendarDays, eachDayOfInterval, isSameDay } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 /** Just so we have something to initialise with */
@@ -254,25 +254,66 @@ export function selectReturnFlight(state: BookingState, inboundTimetableFlight: 
   }
 }
 
-export function CreateBooking(state: BookingState, tickets: Ticket[]): FlightBooking {
-  if (state.kind === 'return_booking') {
-    return {
-      kind: 'return',
-      purchaserUsername: '',
-      outboundDate: state.outboundFlight.date,
-      outboundFlightNumber: state.outboundTimetableFlight.flightNumber,
-      outboundTickets: tickets,
-      inboundDate: state.inboundFlight.date,
-      inboundFlightNumber: state.inboundTimetableFlight.flightNumber,
-      inboundTickets: [],
-    };
-  } else if (state.kind === 'one_way_booking') {
+function calcPrice(ticketType: TicketType, passengerType: PassengerType, flight: Flight): number {
+  const base = ticketType === 'full' ? flight.fullPrice : flight.discountPrice;
+  const adjusted = passengerType === 'adult' ? base : Math.round(base * 0.5);	// children are half price
+  return adjusted;
+}
+
+export function CreateOneWayBooking(state: BookingState, ticketType: TicketType, passengers: Passenger[], username: string): OneWayBooking {
+  if (state.kind === 'one_way_booking') {
+
+    const tickets = passengers.map(p => ({
+      firstName: p.firstName,
+      surname: p.surname,
+      passengerType: p.passengerType,
+      price: calcPrice(ticketType, p.passengerType, state.outboundFlight),
+      seatNumber: undefined,
+    }));
+
     return {
       kind: 'oneWay',
-      purchaserUsername: '',
+      purchaserUsername: username,
       date: state.outboundFlight.date,
+      ticketType: ticketType,
       flightNumber: state.outboundTimetableFlight.flightNumber,
       tickets: tickets,
+    };
+  } else {
+    throw new Error(`Cannot create booking created state from ${state.kind}`);
+  }
+}
+
+export function CreateBooking(state: BookingState, outboundTicketType: TicketType, inboundTicketType: TicketType, passengers: Passenger[], username: string): ReturnBooking {
+  if (state.kind === 'return_booking') {
+
+    const outboundTickets = passengers.map(p => ({
+      firstName: p.firstName,
+      surname: p.surname,
+      passengerType: p.passengerType,
+      price: calcPrice(outboundTicketType, p.passengerType, state.outboundFlight),
+      seatNumber: undefined,
+    }));
+
+    const inboundTickets = passengers.map(p => ({
+      firstName: p.firstName,
+      surname: p.surname,
+      passengerType: p.passengerType,
+      price: calcPrice(inboundTicketType, p.passengerType, state.inboundFlight),
+      seatNumber: undefined,
+    }));
+
+    return {
+      kind: 'return',
+      purchaserUsername: username,
+      outboundDate: state.outboundFlight.date,
+      outboundFlightNumber: state.outboundTimetableFlight.flightNumber,
+      outboundTicketType: outboundTicketType,
+      outboundTickets: outboundTickets,
+      inboundDate: state.inboundFlight.date,
+      inboundFlightNumber: state.inboundTimetableFlight.flightNumber,
+      inboundTicketType: inboundTicketType,
+      inboundTickets: inboundTickets,
     };
   } else {
     throw new Error(`Cannot create booking created state from ${state.kind}`);

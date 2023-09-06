@@ -1,0 +1,29 @@
+<form [formGroup]="bookingForm">
+  <div>
+    <label for="ticketType">Ticket Type</label>
+    <mat-button-toggle-group formControlName="ticketType" aria-label="Number of tickets">
+      <mat-button-toggle value="discount">Discount</mat-button-toggle>
+      <mat-button-toggle value="full">Full</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <div formArrayName="passengers">
+    <div *ngFor="let passengerForm of passengerArray.controls; let i=index">
+      <div [formGroup]="passengerForm">
+        <mat-form-field>
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" required>
+          <mat-error *ngIf="passengerForm.controls['firstName'].invalid">Something here</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Last Name</mat-label>
+          <input matInput formControlName="surname" required>
+          <mat-error *ngIf="passengerForm.controls['surname'].invalid">Something here</mat-error>
+        </mat-form-field>
+        <mat-button-toggle-group formControlName="passengerType" aria-label="Passenger Type">
+          <mat-button-toggle value="adult">Adult</mat-button-toggle>
+          <mat-button-toggle value="child">Child</mat-button-toggle>
+        </mat-button-toggle-group>
+          </div>
+    </div>
+  </div>
+</form>

@@ -4,5 +4,6 @@
   <app-choose-date *ngIf="state.kind === 'destination' || state.kind === 'return_flight_requested'" [bookingState]="state" (dateSelected)="selectDate($event)" />
   <app-choose-flight *ngIf="state.kind === 'nominal_date' || state.kind === 'nominal_return_date'" [bookingState]="state" (flightSelected)="selectFlight($event)" />
   <app-choose-return *ngIf="state.kind === 'outbound_flight'" [bookingState]="state" (oneWaySelected)="selectOneWay()" (returnSelected)="selectReturn()" />
-  <app-finalise *ngIf="state.kind === 'one_way_booking' || state.kind === 'return_booking'" [bookingState]="state" />
+  <app-finalise-oneway *ngIf="state.kind === 'one_way_booking'" [bookingState]="state" />
+  <app-finalise-return *ngIf="state.kind === 'return_booking'" [bookingState]="state" />
 </div>

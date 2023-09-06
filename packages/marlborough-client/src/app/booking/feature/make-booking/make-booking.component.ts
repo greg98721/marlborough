@@ -23,6 +23,8 @@ import { ChooseDateComponent } from '../../ui/choose-date/choose-date.component'
 import { ChooseFlightComponent } from '../../ui/choose-flight/choose-flight.component';
 import { ChooseReturnComponent } from '../../ui/choose-return/choose-return.component';
 import { FinaliseComponent } from '../../ui/finalise/finalise.component';
+import { FinaliseOnewayComponent } from '../../ui/finalise-oneway/finalise-oneway.component';
+import { FinaliseReturnComponent } from '../../ui/finalise-return/finalise-return.component';
 
 @Component({
   selector: 'app-make-booking',
@@ -34,7 +36,9 @@ import { FinaliseComponent } from '../../ui/finalise/finalise.component';
     ChooseDateComponent,
     ChooseFlightComponent,
     ChooseReturnComponent,
-    FinaliseComponent],
+    FinaliseComponent,
+    FinaliseOnewayComponent,
+    FinaliseReturnComponent],
   templateUrl: './make-booking.component.html',
   styleUrls: ['./make-booking.component.scss']
 })
