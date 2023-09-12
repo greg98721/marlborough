@@ -22,7 +22,6 @@ import { ChooseDestinationComponent } from '../../ui/choose-destination/choose-d
 import { ChooseDateComponent } from '../../ui/choose-date/choose-date.component';
 import { ChooseFlightComponent } from '../../ui/choose-flight/choose-flight.component';
 import { ChooseReturnComponent } from '../../ui/choose-return/choose-return.component';
-import { FinaliseComponent } from '../../ui/finalise/finalise.component';
 import { FinaliseOnewayComponent } from '../../ui/finalise-oneway/finalise-oneway.component';
 import { FinaliseReturnComponent } from '../../ui/finalise-return/finalise-return.component';
 
@@ -36,7 +35,6 @@ import { FinaliseReturnComponent } from '../../ui/finalise-return/finalise-retur
     ChooseDateComponent,
     ChooseFlightComponent,
     ChooseReturnComponent,
-    FinaliseComponent,
     FinaliseOnewayComponent,
     FinaliseReturnComponent],
   templateUrl: './make-booking.component.html',
@@ -126,14 +124,7 @@ export class MakeBookingComponent implements OnInit {
   }
 
   selectReturn() {
-    const state = this._currentState;
-    if (state.kind === 'outbound_flight') {
-      const returnRoute = { origin: state.outboundTimetableFlight.route.destination, destination: state.outboundTimetableFlight.route.origin };
-      const newState = requestReturnFlight(state, returnRoute);
-      this._updateState(newState);
-    } else {
-      throw new Error(`Cannot set the return_flight_requested state from ${state.kind}`);
-    }
+    this._updateState(requestReturnFlight(this._currentState));
   }
 
   selectTickets(tickets: Ticket[]) {

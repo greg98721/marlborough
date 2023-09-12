@@ -5,11 +5,15 @@ import { FormBuilder, Validators, ReactiveFormsModule, FormArray, FormGroup } fr
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { PassengerType } from '@marlborough/model';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-finalise-oneway',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonToggleModule, MatFormFieldModule],
+  imports: [CommonModule, ReactiveFormsModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, MatTooltipModule],
   templateUrl: './finalise-oneway.component.html',
   styleUrls: ['./finalise-oneway.component.scss']
 })
@@ -38,5 +42,17 @@ export class FinaliseOnewayComponent {
 
   get passengerArray() {
     return this.bookingForm.controls['passengers']; // as FormArray<passenger>;
+  }
+
+  addPassenger() {
+    this.passengerArray.push(this._fb.nonNullable.group({
+      firstName: ['', Validators.required],
+      surname: ['', Validators.required],
+      passengerType: ['adult'],
+    }));
+  }
+
+  removePassenger(index: number) {
+    this.passengerArray.removeAt(index);
   }
 }

@@ -1,4 +1,4 @@
-import { Airport, AirRoute, EMPTY_FLIGHT, Flight, FlightBooking, maximumBookingDay, OneWayBooking, Passenger, PassengerType, ReturnBooking, startOfDayInTimezone, Ticket, TicketType, TimetableFlight, timezone } from "@marlborough/model";
+import { Airport, AirRoute, EMPTY_FLIGHT, Flight, maximumBookingDay, OneWayBooking, Passenger, PassengerType, ReturnBooking, startOfDayInTimezone, TicketType, TimetableFlight, timezone } from "@marlborough/model";
 import { addDays, parseISO, differenceInCalendarDays, eachDayOfInterval, isSameDay } from 'date-fns/fp'; // Note using the functional version of the date-fns library
 
 /** Just so we have something to initialise with */
@@ -163,8 +163,9 @@ export function oneWayOnly(state: BookingState): BookingState {
   }
 }
 
-export function requestReturnFlight(state: BookingState, returnRoute: AirRoute): BookingState {
+export function requestReturnFlight(state: BookingState): BookingState {
   if (state.kind === 'outbound_flight') {
+    const returnRoute = { origin: state.outboundTimetableFlight.route.destination, destination: state.outboundTimetableFlight.route.origin };
     // As far as the demo goes there will always be a return route - but in reality there may not be
     if (state.outboundTimetableFlight.route.origin === returnRoute.destination && state.outboundTimetableFlight.route.destination === returnRoute.origin) {
 

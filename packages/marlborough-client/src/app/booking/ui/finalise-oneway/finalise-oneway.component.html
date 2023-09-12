@@ -12,18 +12,25 @@
         <mat-form-field>
           <mat-label>First Name</mat-label>
           <input matInput formControlName="firstName" required>
-          <mat-error *ngIf="passengerForm.controls['firstName'].invalid">Something here</mat-error>
+          <mat-error *ngIf="passengerForm.controls['firstName'].hasError('required')">A first name is required</mat-error>
         </mat-form-field>
         <mat-form-field>
           <mat-label>Last Name</mat-label>
           <input matInput formControlName="surname" required>
-          <mat-error *ngIf="passengerForm.controls['surname'].invalid">Something here</mat-error>
+          <mat-error *ngIf="passengerForm.controls['surname'].hasError('required')">A surname is required</mat-error>
         </mat-form-field>
         <mat-button-toggle-group formControlName="passengerType" aria-label="Passenger Type">
           <mat-button-toggle value="adult">Adult</mat-button-toggle>
           <mat-button-toggle value="child">Child</mat-button-toggle>
         </mat-button-toggle-group>
-          </div>
+        <button mat-mini-fab color="primary" (click)="removePassenger(i)" matTooltip="Remove this passenger"
+          matTooltipPosition="after" aria-label="Remove this passenger">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </div>
+    <button mat-fab color="primary" (click)="addPassenger()" aria-label="Add passenger">
+      <mat-icon>add</mat-icon>
+    </button>
   </div>
 </form>
